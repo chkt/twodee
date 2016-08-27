@@ -1,0 +1,60 @@
+{
+	"name" : "twodee",
+	"description" : "Two dimensional geometry manipulation",
+	"version" : "0.1.0",
+	"license" : "MIT",
+
+	"keywords" : [
+		"geometry",
+		"2d",
+		"collision",
+		"triangle",
+		"rectangle",
+		"mesh",
+		"polyline",
+		"polygon"
+	],
+
+	"author" : {
+		"name" : "Christoph Kettelhoit",
+		"email" : "ck@christoph-kettelhoit.de",
+		"url" : "christoph-kettelhoit.de"
+	},
+
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/chkt/twod"
+	},
+
+	"scripts" : {
+		"gulp" : "node ./node_modules/gulp/bin/gulp.js",
+		"test" : "node ./node_modules/gulp/bin/gulp.js test"
+	},
+
+	"files" : [
+		"source/",
+		"es5/"
+	],
+
+	"babel" : {
+		"presets" : [ "es2015" ]
+	},
+
+	"dependencies" : {
+		"xyzw" : "~0.9"
+	},
+
+	"devDependencies" : {
+		"del" : "~2.0",
+		"babel" : "~6.5",
+		"babel-polyfill" : "~6.5",
+		"babel-preset-es2015": "~6.5",
+		"jscs" : "~2.1",
+		"tesa" : "~0.2",
+		"gulp" : "~3.9",
+		"gulp-jshint" : "~1.11",
+		"gulp-jscs" : "~2.0",
+		"gulp-babel" : "~6.1",
+		"gulp-mocha" : "~2.1"
+	}
+}
