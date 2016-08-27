@@ -242,7 +242,7 @@ export default class Polygon2 {
 		const e = _edge.get(this), res = [];
 
 		for (let i = 0, f0 = 0, l = e.length; f0 < l; i += 1, f0 += 4) {
-			if (e[f0] !== -1) res.push(i);
+			if (e[f0] !== -1 || e[f0 + 1] !== -1) res.push(i);
 		}
 
 		return res;
