@@ -101,7 +101,7 @@ function _addVertexEdge(vertex, edge) {
 }
 
 function _removeVertexEdge(vertex, edge) {
-	const v = _vertex.get(this), vE = _vertexEdge.get(this)
+	const v = _vertex.get(this), vE = _vertexEdge.get(this);
 	let dirty = _vertexEdgeDirty.get(this);
 
 	const e0 = vertex * 2, eN = e0 + 1;
@@ -383,19 +383,17 @@ export default class Polygon2 {
 	 */
 	edgeOfVertex(vertex, constraint) {
 		const v = _vertex.get(this), e0 = vertex * 2;
-		const edge = _vertexEdge.get(this).slice(v[e0], v[e0 + 1]);
+		const eN = _vertexEdge.get(this).slice(v[e0], v[e0 + 1]);
 
-		if (constraint === undefined) return edge;
+		if (constraint === undefined) return eN;
 
-		const e = _edge.get(this), res = [];
+		const e = _edge.get(this), res = Array(constraint.length).fill(-1);
 
-		for (let i = constraint.length - 1; i > -1; i -= 1) res.push(-1);
-
-		for (let i = edge.length - 1; i > -1; i -= 1) {
-			const edge0 = edge[i], v0 = edge0 * 4 + 2;
+		for (let edge of eN) {
+			const v0 = edge * 4 + 2;
 			const index = constraint.indexOf(e[v0] !== vertex ? e[v0] : e[v0 + 1]);
 
-			if (index !== -1) res[index] = edge0;
+			if (index !== -1) res[index] = edge;
 		}
 
 		return res;
@@ -597,17 +595,16 @@ export default class Polygon2 {
 	 */
 	turnEdge(edge) {
 		const e = _edge.get(this), f0 = edge * 4, f1 = f0 + 1;
-
-		var f0vn = this.vertexOfFace(e[f0], edge);
-		var f1vn = this.vertexOfFace(e[f1], edge);
+		const [f0v0, f0v1, f0v2] = this.vertexOfFace(e[f0], edge);
+		const [f1v0, f1v1, f1v2] = this.vertexOfFace(e[f1], edge);
 
 		this.removeFace(e[f0]);
 		this.removeFace(e[f1]);
 
-		this.createFace(f1vn[2], f0vn[2], f0vn[0]);
-		this.createFace(f0vn[2], f1vn[2], f0vn[1]);
+		this.createFace(f1v2, f0v2, f0v0);
+		this.createFace(f0v2, f1v2, f0v1);
 
-		return this.edgeOfVertex(f0vn[2], [f1vn[2]])[0];
+		return this.edgeOfVertex(f0v2, [f1v2])[0];
 	}
 
 	/**
