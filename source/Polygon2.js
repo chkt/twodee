@@ -2,7 +2,7 @@ import Vector2 from 'xyzw/es5/Vector2';
 
 import Triangle2 from './Triangle2';
 import Rectangle2 from './Rectangle2';
-import CollisionMesh from './CollisionMesh';
+import TriangeSubdivisionTree from './TriangleSubdivisionTree';
 
 
 
@@ -153,7 +153,7 @@ export default class Polygon2 {
 		const aabb = Rectangle2.AABB(points);
 		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 1.1);
 
-		const mesh = new CollisionMesh(bound);
+		const mesh = new TriangeSubdivisionTree(bound);
 
 		mesh.addPoints(points);
 
