@@ -2,6 +2,8 @@ import assert from 'assert';
 import { describe, it } from 'mocha';
 
 import Vector2 from 'xyzw/es5/Vector2';
+import Matrix3 from 'xyzw/es5/Matrix3';
+
 import Polygon2 from '../source/Polygon2';
 
 
@@ -45,7 +47,7 @@ describe('Polygon2', () => {
 			assert.strictEqual(poly.edge.length, 5);
 			assert.strictEqual(poly.vertex.length, 4);
 		});
-	})
+	});
 
 	describe('turnEdge', () => {
 		it("should turn the specified edge", () => {
@@ -59,6 +61,28 @@ describe('Polygon2', () => {
 
 			assert.notStrictEqual(f2, -1);
 			assert.notStrictEqual(f3, -1);
+		});
+	});
+
+	describe('intersects', () => {
+		it("should detect intersections between instances", () => {
+			const polyA = new Polygon2();
+			const polyB = new Polygon2();
+
+			_createQuad(polyA);
+			_createQuad(polyB);
+
+			const m = Matrix3.Translation(new Vector2([0.75, 0.0]));
+
+			assert.strictEqual(polyA.intersects(polyB), true);
+
+			polyB.transformation(m);
+
+			assert.strictEqual(polyA.intersects(polyB), true);
+
+			polyB.transformation(m);
+
+			assert.strictEqual(polyA.intersects(polyB), false);
 		});
 	});
 });
