@@ -2,6 +2,47 @@ import Vector2 from 'xyzw/es5/Vector2';
 import Rectangle2 from './Rectangle2';
 
 
+/**
+ * Returns true if colinear segments (p0,p1) and (q0,q1) overlap, false otherwise
+ * @private
+ * @param {Vector2} p0 - The first point of the first segment
+ * @param {Vector2} p1 - The second point of the first segment
+ * @param {Vector2} q0 - The first point of the second segment
+ * @param {Vector2} q1 - The second point of the second segment
+ * @param {Vector2} [r] - The intersection point
+ * References the center of the overlap if segments overlap
+ * @returns {boolean}
+ */
+function _intersectColinearSegments(p0, p1, q0, q1, r) {
+	const va = Vector2.Subtract(p1, p0);
+	let o, sp1, sq0, sq1;
+
+	if (va.y < va.x) o = p0.x, sp1 = p1.x - o, sq0 = q0.x - o, sq1 = q1.x - o;
+	else o = p0.y, sp1 = p1.y - o, sq0 = q0.y - o, sq1 = q1.y - o;
+
+	const [pmin, pmax] = 0.0 < sp1 ? [0.0, sp1] : [sp1, 0.0];
+	const [qmin, qmax] = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0];
+
+	if (pmax - qmin < 0 || qmax - pmin < 0) return false;
+
+	if (r) {
+		const sr0 = Math.max(pmin, qmin) / sp1;
+		const sr1 = Math.min(pmax, qmax) / sp1;
+
+		const s = Vector2.Copy(va).multiplyScalarEQ(sr0);
+
+		r
+			.copyOf(va)
+			.multiplyScalarEQ(sr1)
+			.subtractEQ(s)
+			.multiplyScalarEQ(0.5)
+			.addEQ(s)
+			.addEQ(p0);
+	}
+
+	return true;
+}
+
 
 /**
  * Planar geometric primitive, first order
@@ -107,7 +148,7 @@ export default class PolyLine2 {
 
 
 	/**
-	 * Returns true if segment (p0,p1) intersects segment (q0,q1), false otherwise
+	 * Returns true if segment (p0,p1) intersects segment (q0,q1), false otherwise (RRp781)
 	 * @param {Vector2} p0 - The first point of the first segment
 	 * @param {Vector2} p1 - The second point of the first segment
 	 * @param {Vector2} q0 - The first point of the second segment
@@ -117,22 +158,24 @@ export default class PolyLine2 {
 	 * @returns {boolean}
 	 */
 	static intersectSegments(p0, p1, q0, q1, r) {
-		const vA = Vector2.Subtract(p1, p0);
-		const vB = Vector2.Subtract(q0, q1);
+		const vA = Vector2.Subtract(q1, q0);
+		const vBp = Vector2.Subtract(p1, p0).perpendicular();
+		const f = Vector2.dot(vA, vBp);
+
 		const vC = Vector2.Subtract(p0, q0);
+		const a = Vector2.dot(vC, Vector2.Perpendicular(vA));
 
-		const d = Vector2.cross(vB, vA);
-		const a = Vector2.cross(vC, vB);
+		if (f === 0.0) return a === 0 && _intersectColinearSegments(p0, p1, q0, q1, r);
 
-		if (d > 0.0 && (a < 0.0 || a > d) || d <= 0.0 && (a > 0.0 || a < d)) return false;
+		if (f > 0.0 && (a < 0.0 || a > f) || f < 0.0 && (a > 0.0 || a < f)) return false;
 
-		const b = Vector2.cross(vA, vC);
+		const b = Vector2.dot(vC, vBp);
 
-		if (d > 0 && (b < 0 || b > d) || d <= 0.0 && (b > 0.0 || b < d)) return false;
+		if (f > 0.0 && (b < 0.0 || b > f) || f < 0.0 && (b > 0.0 || b < f)) return false;
 
 		if (r !== undefined) r
 			.copyOf(vA)
-			.multiplyScalarEQ(a / d)
+			.multiplyScalarEQ(a / f)
 			.addEQ(p0);
 
 		return true;
@@ -159,8 +202,8 @@ export default class PolyLine2 {
 
 		const rr = [], v = new Vector2();
 
-		for (i = 0, p0 = pN[0], p1 = pN[1]; p1; p0 = pN[++i], p1 = pN[i + 1]) {
-			for (j = 0, q0 = qN[0], q1 = qN[1]; q1; q0 = qN[++j], q1 = qN[j + 1]) {
+		for (let i = 0, p0 = pN[0], p1 = pN[1]; p1; p0 = pN[++i], p1 = pN[i + 1]) {
+			for (let j = 0, q0 = qN[0], q1 = qN[1]; q1; q0 = qN[++j], q1 = qN[j + 1]) {
 				if (PolyLine2.intersectSegments(p0, p1, q0, q1, v)) rr.push(Vector2.Copy(v));
 			}
 		}
