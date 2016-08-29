@@ -632,6 +632,40 @@ export default class Polygon2 {
 		return false;
 	}
 
+	/**
+	 * Returns true if the instance intersects with poly, false otherwise
+	 * @param {Polygon2} poly - The antagonist
+	 * @returns {boolean}
+	 */
+	intersects(poly) {
+		const fA = _face.get(this), fB = _face.get(poly);
+		const pA = _point.get(this), pB = _point.get(poly);
+
+		for (let vA0 = fA.length - 3; vA0 > -1; vA0 -= 6) {
+			const pA0 = pA[fA[vA0]], pA1 = pA[fA[vA0 + 1]], pA2 = pA[fA[vA0 + 2]];
+
+			for (let vB0 = fB.length - 3; vB0 > -1; vB0 -= 6) {
+				const pB0 = pB[fB[vB0]], pB1 = pB[fB[vB0 + 1]], pB2 = pB[fB[vB0 + 2]];
+
+				if (Triangle2.intersect(pA0, pA1, pA2, pB0, pB1, pB2)) return true;
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * The transformation of poly
+	 * @param {Polygon2} poly - The source
+	 * @param {Matrix3} transform - The transform
+	 * @returns {Polygon2}
+	 */
+	transformationOf(poly, transform) {
+		if (this !== poly) this.copyOf(poly);
+
+		return this.transformation(transform);
+	}
 
 	/**
 	 * The copy of poly
@@ -640,5 +674,23 @@ export default class Polygon2 {
 	 */
 	copyOf(poly) {
 		return Polygon2.Copy(poly, this);
+	}
+
+
+	/**
+	 * The transformation of the instance
+	 * @param {Matrix3} transform - the transform
+	 * @returns {Polygon2}
+	 */
+	transformation(transform) {
+		const point = _point.get(this);
+
+		for (let i = point.length - 1; i > -1; i -= 1) {
+			const p = point[i];
+
+			Vector2.Multiply2x3Matrix3(transform, p, p);
+		}
+
+		return this;
 	}
 }
