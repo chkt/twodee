@@ -279,9 +279,10 @@ export default class PolyLine2 {
 	 * @returns {PolyLine2}
 	 */
 	transformationOf(poly, transform) {
-		this.point = [];
+		const p = poly.point;
+		const q = this.point = [];
 
-		for (var i = 0, point = poly.point[0]; point; point = poly.point[++i]) this.point.push(Vector2.Multiply2x3Matrix3(transform, point));
+		for (let point of p) q.push(Vector2.Multiply2x3Matrix3(transform, point));
 
 		return this;
 	}
@@ -306,7 +307,7 @@ export default class PolyLine2 {
 	 * @returns {PolyLine2}
 	 */
 	transformation(transform) {
-		return this.transformationOf(PolyLine2.Copy(this), transform);
+		return this.transformationOf(this, transform);
 	}
 
 
