@@ -54,7 +54,7 @@ describe('PolyLine2', () => {
 			], false);
 		});
 
-		it("should find intersections between coplanar overlapping segments", () => {
+		it("should find intersections between colinear overlapping segments", () => {
 			_testIntersectSegments([
 				new Vector2([0.0, 0.0]),
 				new Vector2([0.0, 1.0]),
@@ -63,7 +63,21 @@ describe('PolyLine2', () => {
 			], true);
 		});
 
-		it("should not find intersections between coplanar separated segments", () => {
+		it("should find the center point of the the overlap between colinear overlapping segments", () => {
+			const p0 = new Vector2([5.0, 1.0]);
+			const p1 = new Vector2([1.0, 5.0]);
+			const q0 = new Vector2([2.0, 4.0]);
+			const q1 = new Vector2([4.0, 2.0]);
+
+			const i = new Vector2([3.0, 3.0]);
+			const r = new Vector2();
+
+			PolyLine2.intersectSegments(p0, p1, q0, q1, r);
+
+			assert(Vector2.isEQ(i, r));
+		});
+
+		it("should not find intersections between colinear separated segments", () => {
 			_testIntersectSegments([
 				new Vector2([0.0, 0.0]),
 				new Vector2([1.0, 0.0]),
