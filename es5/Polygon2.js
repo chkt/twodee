@@ -917,6 +917,84 @@ var Polygon2 = function () {
 
 			return res;
 		}
+
+		/**
+   * The deferenced list of points of the instance
+   * @type Vector2[]
+   */
+
+	}, {
+		key: 'point',
+		get: function get() {
+			return _point.get(this).slice(0);
+		}
+
+		/**
+   * The dereferenced display list of vertex indices of the instance
+   * @type number[]
+   */
+
+	}, {
+		key: 'indexList',
+		get: function get() {
+			var face = _face.get(this),
+			    res = [];
+
+			for (var v0 = 3, l = face.length; v0 < l; v0 += 6) {
+				res.push(face[v0], face[v0 + 1], face[v0 + 2]);
+			}return res;
+		}
+
+		/**
+   * The dereferenced centroid point
+   * @returns {Vector2}
+   */
+
+	}, {
+		key: 'centroid',
+		get: function get() {
+			var face = _face.get(this),
+			    point = _point.get(this),
+			    THIRD = 1.0 / 3.0;
+			var tri = new _Triangle2.default(),
+			    res = new _Vector2.default();
+
+			var atot = 0;
+
+			for (var v0 = face.length - 3; v0 > -1; v0 -= 6) {
+				tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+
+				var a = tri.area;
+
+				res.addEQ(tri.centroid.multiplyScalarEQ(a));
+				atot += a;
+			}
+
+			return res.multiplyScalarEQ(1 / atot);
+		}
+
+		/**
+   * The area sum((1/2)|AB x AC|)
+   * @returns {number}
+   */
+
+	}, {
+		key: 'area',
+		get: function get() {
+			var face = _face.get(this),
+			    point = _point.get(this);
+			var tri = new _Triangle2.default();
+
+			var res = 0.0;
+
+			for (var v0 = face.length - 3; v0 > -1; v0 -= 6) {
+				tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+
+				res += tri.area;
+			}
+
+			return res;
+		}
 	}]);
 
 	return Polygon2;

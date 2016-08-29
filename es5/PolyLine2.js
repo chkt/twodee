@@ -315,11 +315,34 @@ var PolyLine2 = function () {
 	}, {
 		key: 'transformationOf',
 		value: function transformationOf(poly, transform) {
-			this.point = [];
+			var p = poly.point;
+			var q = this.point = [];
 
-			for (var i = 0, point = poly.point[0]; point; point = poly.point[++i]) {
-				this.point.push(_Vector2.default.Multiply2x3Matrix3(transform, point));
-			}return this;
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+				for (var _iterator = p[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var point = _step.value;
+					q.push(_Vector2.default.Multiply2x3Matrix3(transform, point));
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
+
+			return this;
 		}
 
 		/**
@@ -347,7 +370,7 @@ var PolyLine2 = function () {
 	}, {
 		key: 'transformation',
 		value: function transformation(transform) {
-			return this.transformationOf(PolyLine2.Copy(this), transform);
+			return this.transformationOf(this, transform);
 		}
 
 		/**
