@@ -262,6 +262,69 @@ export default class Polygon2 {
 		return res;
 	}
 
+	/**
+	 * The deferenced list of points of the instance
+	 * @type Vector2[]
+	 */
+	get point() {
+		return _point.get(this).slice(0);
+	}
+
+
+	/**
+	 * The dereferenced display list of vertex indices of the instance
+	 * @type number[]
+	 */
+	get indexList() {
+		const face = _face.get(this), res = [];
+
+		for (let v0 = 3, l = face.length; v0 < l; v0 += 6) res.push(face[v0], face[v0 + 1], face[v0 + 2]);
+
+		return res;
+	}
+
+
+	/**
+	 * The dereferenced centroid point
+	 * @returns {Vector2}
+	 */
+	get centroid() {
+		const face = _face.get(this), point = _point.get(this), THIRD = 1.0 / 3.0;
+		const tri = new Triangle2(), res = new Vector2();
+
+		let atot = 0;
+
+		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) {
+			tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+
+			const a = tri.area;
+
+			res.addEQ(tri.centroid.multiplyScalarEQ(a));
+			atot += a;
+		}
+
+		return res.multiplyScalarEQ(1 / atot);
+	}
+
+	/**
+	 * The area sum((1/2)|AB x AC|)
+	 * @returns {number}
+	 */
+	get area() {
+		const face = _face.get(this), point = _point.get(this);
+		const tri = new Triangle2();
+
+		let res = 0.0;
+
+		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) {
+			tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+
+			res += tri.area;
+		}
+
+		return res;
+	}
+
 
 	/**
 	 * Returns true if face is a defined face index, false otherwise
