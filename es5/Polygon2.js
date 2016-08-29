@@ -793,6 +793,52 @@ var Polygon2 = function () {
 		}
 
 		/**
+   * Returns true if the instance intersects with poly, false otherwise
+   * @param {Polygon2} poly - The antagonist
+   * @returns {boolean}
+   */
+
+	}, {
+		key: 'intersects',
+		value: function intersects(poly) {
+			var fA = _face.get(this),
+			    fB = _face.get(poly);
+			var pA = _point.get(this),
+			    pB = _point.get(poly);
+
+			for (var vA0 = fA.length - 3; vA0 > -1; vA0 -= 6) {
+				var pA0 = pA[fA[vA0]],
+				    pA1 = pA[fA[vA0 + 1]],
+				    pA2 = pA[fA[vA0 + 2]];
+
+				for (var vB0 = fB.length - 3; vB0 > -1; vB0 -= 6) {
+					var pB0 = pB[fB[vB0]],
+					    pB1 = pB[fB[vB0 + 1]],
+					    pB2 = pB[fB[vB0 + 2]];
+
+					if (_Triangle2.default.intersect(pA0, pA1, pA2, pB0, pB1, pB2)) return true;
+				}
+			}
+
+			return false;
+		}
+
+		/**
+   * The transformation of poly
+   * @param {Polygon2} poly - The source
+   * @param {Matrix3} transform - The transform
+   * @returns {Polygon2}
+   */
+
+	}, {
+		key: 'transformationOf',
+		value: function transformationOf(poly, transform) {
+			if (this !== poly) this.copyOf(poly);
+
+			return this.transformation(transform);
+		}
+
+		/**
    * The copy of poly
    * @param {Polygon2} poly - The source polygon
    * @returns {Polygon2}
@@ -802,6 +848,26 @@ var Polygon2 = function () {
 		key: 'copyOf',
 		value: function copyOf(poly) {
 			return Polygon2.Copy(poly, this);
+		}
+
+		/**
+   * The transformation of the instance
+   * @param {Matrix3} transform - the transform
+   * @returns {Polygon2}
+   */
+
+	}, {
+		key: 'transformation',
+		value: function transformation(transform) {
+			var point = _point.get(this);
+
+			for (var i = point.length - 1; i > -1; i -= 1) {
+				var p = point[i];
+
+				_Vector2.default.Multiply2x3Matrix3(transform, p, p);
+			}
+
+			return this;
 		}
 	}, {
 		key: 'face',

@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 var _Vector = require('xyzw/es5/Vector2');
 
 var _Vector2 = _interopRequireDefault(_Vector);
@@ -19,8 +21,58 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
+ * Returns true if colinear segments (p0,p1) and (q0,q1) overlap, false otherwise
+ * @private
+ * @param {Vector2} p0 - The first point of the first segment
+ * @param {Vector2} p1 - The second point of the first segment
+ * @param {Vector2} q0 - The first point of the second segment
+ * @param {Vector2} q1 - The second point of the second segment
+ * @param {Vector2} [r] - The intersection point
+ * References the center of the overlap if segments overlap
+ * @returns {boolean}
+ */
+function _intersectColinearSegments(p0, p1, q0, q1, r) {
+	var va = _Vector2.default.Subtract(p1, p0);
+	var o = void 0,
+	    sp1 = void 0,
+	    sq0 = void 0,
+	    sq1 = void 0;
+
+	if (va.y < va.x) o = p0.x, sp1 = p1.x - o, sq0 = q0.x - o, sq1 = q1.x - o;else o = p0.y, sp1 = p1.y - o, sq0 = q0.y - o, sq1 = q1.y - o;
+
+	var _ref = 0.0 < sp1 ? [0.0, sp1] : [sp1, 0.0];
+
+	var _ref2 = _slicedToArray(_ref, 2);
+
+	var pmin = _ref2[0];
+	var pmax = _ref2[1];
+
+	var _ref3 = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0];
+
+	var _ref4 = _slicedToArray(_ref3, 2);
+
+	var qmin = _ref4[0];
+	var qmax = _ref4[1];
+
+
+	if (pmax - qmin < 0 || qmax - pmin < 0) return false;
+
+	if (r) {
+		var sr0 = Math.max(pmin, qmin) / sp1;
+		var sr1 = Math.min(pmax, qmax) / sp1;
+
+		var s = _Vector2.default.Copy(va).multiplyScalarEQ(sr0);
+
+		r.copyOf(va).multiplyScalarEQ(sr1).subtractEQ(s).multiplyScalarEQ(0.5).addEQ(s).addEQ(p0);
+	}
+
+	return true;
+}
+
+/**
  * Planar geometric primitive, first order
  */
+
 var PolyLine2 = function () {
 	_createClass(PolyLine2, null, [{
 		key: 'ConvexHullGraham',
@@ -129,7 +181,7 @@ var PolyLine2 = function () {
 		}
 
 		/**
-   * Returns true if segment (p0,p1) intersects segment (q0,q1), false otherwise
+   * Returns true if segment (p0,p1) intersects segment (q0,q1), false otherwise (RRp781)
    * @param {Vector2} p0 - The first point of the first segment
    * @param {Vector2} p1 - The second point of the first segment
    * @param {Vector2} q0 - The first point of the second segment
@@ -142,20 +194,22 @@ var PolyLine2 = function () {
 	}, {
 		key: 'intersectSegments',
 		value: function intersectSegments(p0, p1, q0, q1, r) {
-			var vA = _Vector2.default.Subtract(p1, p0);
-			var vB = _Vector2.default.Subtract(q0, q1);
+			var vA = _Vector2.default.Subtract(q1, q0);
+			var vBp = _Vector2.default.Subtract(p1, p0).perpendicular();
+			var f = _Vector2.default.dot(vA, vBp);
+
 			var vC = _Vector2.default.Subtract(p0, q0);
+			var a = _Vector2.default.dot(vC, _Vector2.default.Perpendicular(vA));
 
-			var d = _Vector2.default.cross(vB, vA);
-			var a = _Vector2.default.cross(vC, vB);
+			if (f === 0.0) return a === 0 && _intersectColinearSegments(p0, p1, q0, q1, r);
 
-			if (d > 0.0 && (a < 0.0 || a > d) || d <= 0.0 && (a > 0.0 || a < d)) return false;
+			if (f > 0.0 && (a < 0.0 || a > f) || f < 0.0 && (a > 0.0 || a < f)) return false;
 
-			var b = _Vector2.default.cross(vA, vC);
+			var b = _Vector2.default.dot(vC, vBp);
 
-			if (d > 0 && (b < 0 || b > d) || d <= 0.0 && (b > 0.0 || b < d)) return false;
+			if (f > 0.0 && (b < 0.0 || b > f) || f < 0.0 && (b > 0.0 || b < f)) return false;
 
-			if (r !== undefined) r.copyOf(vA).multiplyScalarEQ(a / d).addEQ(p0);
+			if (r !== undefined) r.copyOf(vA).multiplyScalarEQ(a / f).addEQ(p0);
 
 			return true;
 		}
@@ -185,9 +239,9 @@ var PolyLine2 = function () {
 			var rr = [],
 			    v = new _Vector2.default();
 
-			for (i = 0, p0 = pN[0], p1 = pN[1]; p1; p0 = pN[++i], p1 = pN[i + 1]) {
-				for (j = 0, q0 = qN[0], q1 = qN[1]; q1; q0 = qN[++j], q1 = qN[j + 1]) {
-					if (PolyLine2.intersectSegments(p0, p1, q0, q1, v)) rr.push(_Vector2.default.Copy(v));
+			for (var _i = 0, _p = pN[0], _p2 = pN[1]; _p2; _p = pN[++_i], _p2 = pN[_i + 1]) {
+				for (var _j = 0, _q = qN[0], _q2 = qN[1]; _q2; _q = qN[++_j], _q2 = qN[_j + 1]) {
+					if (PolyLine2.intersectSegments(_p, _p2, _q, _q2, v)) rr.push(_Vector2.default.Copy(v));
 				}
 			}
 
