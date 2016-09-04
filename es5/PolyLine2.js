@@ -32,13 +32,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * @returns {boolean}
  */
 function _intersectColinearSegments(p0, p1, q0, q1, r) {
-	var va = _Vector2.default.Subtract(p1, p0);
-	var o = void 0,
-	    sp1 = void 0,
-	    sq0 = void 0,
-	    sq1 = void 0;
-
-	if (va.y < va.x) o = p0.x, sp1 = p1.x - o, sq0 = q0.x - o, sq1 = q1.x - o;else o = p0.y, sp1 = p1.y - o, sq0 = q0.y - o, sq1 = q1.y - o;
+	var va = _Vector2.default.Subtract(p1, p0),
+	    i = Math.abs(va.n[1]) < Math.abs(va.n[0]) ? 0 : 1;
+	var o = p0.n[i],
+	    sp1 = va.n[i],
+	    sq0 = q0.n[i] - o,
+	    sq1 = q1.n[i] - o;
 
 	var _ref = 0.0 < sp1 ? [0.0, sp1] : [sp1, 0.0];
 
@@ -57,13 +56,12 @@ function _intersectColinearSegments(p0, p1, q0, q1, r) {
 
 	if (pmax - qmin < 0 || qmax - pmin < 0) return false;
 
-	if (r) {
+	if (r !== undefined) {
 		var sr0 = Math.max(pmin, qmin) / sp1;
 		var sr1 = Math.min(pmax, qmax) / sp1;
+		var vs = _Vector2.default.Copy(va).multiplyScalarEQ(sr0);
 
-		var s = _Vector2.default.Copy(va).multiplyScalarEQ(sr0);
-
-		r.copyOf(va).multiplyScalarEQ(sr1).subtractEQ(s).multiplyScalarEQ(0.5).addEQ(s).addEQ(p0);
+		r.copyOf(va).multiplyScalarEQ(sr1).subtractEQ(vs).multiplyScalarEQ(0.5).addEQ(vs).addEQ(p0);
 	}
 
 	return true;
@@ -201,7 +199,7 @@ var PolyLine2 = function () {
 			var vC = _Vector2.default.Subtract(p0, q0);
 			var a = _Vector2.default.dot(vC, _Vector2.default.Perpendicular(vA));
 
-			if (f === 0.0) return a === 0 && _intersectColinearSegments(p0, p1, q0, q1, r);
+			if (f === 0.0) return a === 0.0 && _intersectColinearSegments(p0, p1, q0, q1, r);
 
 			if (f > 0.0 && (a < 0.0 || a > f) || f < 0.0 && (a > 0.0 || a < f)) return false;
 

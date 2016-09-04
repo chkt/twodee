@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _Math = require('xyzw/es5/Math');
+
+var _Math2 = _interopRequireDefault(_Math);
+
 var _Vector = require('xyzw/es5/Vector2');
 
 var _Vector2 = _interopRequireDefault(_Vector);
@@ -47,8 +51,37 @@ var Rectangle2 = function () {
    */
 
 	}], [{
-		key: 'AABB',
+		key: 'Define',
 
+
+		/**
+   * Defines an instance
+   * @constructor
+   * @param {Matrix3} transform - The transform
+   * @param {Vector2} extend - The extend
+   * @param {Rectangle2} [target] - The target instance
+   * @returns {Rectangle2}
+   */
+		value: function Define(transform, extend, target) {
+			if (target === undefined) return new this(transform, extend);else return this.call(target, transform, extend);
+		}
+
+		/**
+   * Returns a new instance from w, h
+   * @constructor
+   * @param {number} w - The width
+   * @param {number} h - The height
+   * @param {Rectangle2} [target] - The target instance
+   */
+
+	}, {
+		key: 'Box',
+		value: function Box(w, h, target) {
+			var transform = new _Matrix2.default();
+			var extend = new _Vector2.default([w * 0.5, h * 0.5]);
+
+			return this.Define(transform, extend, target);
+		}
 
 		/**
    * Returns a new instance from point
@@ -57,6 +90,9 @@ var Rectangle2 = function () {
    * @param {Rectangle2} [target] - The target instance
    * @returns {Rectangle2}
    */
+
+	}, {
+		key: 'AABB',
 		value: function AABB(point, target) {
 			var minx = Number.MAX_VALUE,
 			    miny = minx;
@@ -64,10 +100,10 @@ var Rectangle2 = function () {
 			    maxy = maxx;
 
 			for (var i = 0, p = point[0]; p; p = point[++i]) {
-				minx = Math.min(p.n[0], minx);
-				miny = Math.min(p.n[1], miny);
-				maxx = Math.max(p.n[0], maxx);
-				maxy = Math.max(p.n[1], maxy);
+				minx = _Math2.default.min(p.n[0], minx);
+				miny = _Math2.default.min(p.n[1], miny);
+				maxx = _Math2.default.max(p.n[0], maxx);
+				maxy = _Math2.default.max(p.n[1], maxy);
 			}
 
 			var w = (maxx - minx) * 0.5;
@@ -131,7 +167,128 @@ var Rectangle2 = function () {
 			var mT = _Matrix2.default.Inverse(tA);
 			var vP = _Vector2.default.Multiply2x3Matrix3(mT, p);
 
-			if (eA.n[0] < Math.abs(vP.n[0]) || eA.n[1] < Math.abs(vP.n[1])) return false;
+			if (eA.n[0] < _Math2.default.abs(vP.n[0]) || eA.n[1] < _Math2.default.abs(vP.n[1])) return false;
+
+			return true;
+		}
+
+		/**
+   * Returns true if obb (t, e) intersects with triangle(p0,p1,p2)
+   * @param {Matrix3} t - The obb transform
+   * @param {Vector2} e - The obb extend
+   * @param {Vector2} p0 - The first point of the triangle
+   * @param {Vector2} p1 - The second point of the triangle
+   * @param {Vector2} p2 - The third point of the triangle
+   * @returns {boolean}
+   */
+
+	}, {
+		key: 'intersectTriangle',
+		value: function intersectTriangle(t, e, p0, p1, p2) {
+			var ex = e.n[0],
+			    ey = e.n[1];
+
+			var q0 = new _Vector2.default([ex, ey]),
+			    q1 = new _Vector2.default([ex, -ey]);
+			var q2 = new _Vector2.default([-ex, -ey]),
+			    q3 = new _Vector2.default([-ex, ey]);
+
+			q0.multiply2x3Matrix3(t, q0), q1.multiply2x3Matrix3(t, q1);
+			q1.multiply2x3Matrix3(t, q2), q2.multiply2x3Matrix3(t, q3);
+
+			var ps = [p0, p1, p2],
+			    qs = [q0, q1, q2, q3];
+
+			var axes = [_Vector2.default.Subtract(q1, q0), _Vector2.default.Subtract(q2, q1), _Vector2.default.Subtract(p1, p0), _Vector2.default.Subtract(p2, p1), _Vector2.default.Subtract(p0, p2)];
+
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
+
+			try {
+				for (var _iterator = axes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var va = _step.value;
+
+					var vax = va.n[0],
+					    vay = va.n[1];
+
+					var pmin = _Math2.default.MAX_NUMBER,
+					    pmax = -_Math2.default.MAX_NUMBER;
+					var qmin = _Math2.default.MAX_NUMBER,
+					    qmax = -_Math2.default.MAX_NUMBER;
+
+					var _iteratorNormalCompletion2 = true;
+					var _didIteratorError2 = false;
+					var _iteratorError2 = undefined;
+
+					try {
+						for (var _iterator2 = ps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+							var p = _step2.value;
+
+							var dot = vax * p.n[0] + vay * p.n[1];
+
+							pmin = pmin < dot ? pmin : dot;
+							pmax = pmax > dot ? pmax : dot;
+						}
+					} catch (err) {
+						_didIteratorError2 = true;
+						_iteratorError2 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion2 && _iterator2.return) {
+								_iterator2.return();
+							}
+						} finally {
+							if (_didIteratorError2) {
+								throw _iteratorError2;
+							}
+						}
+					}
+
+					var _iteratorNormalCompletion3 = true;
+					var _didIteratorError3 = false;
+					var _iteratorError3 = undefined;
+
+					try {
+						for (var _iterator3 = qs[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+							var q = _step3.value;
+
+							var _dot = vax * q.n[0] + vay * q.n[1];
+
+							qmin = qmin < _dot ? qmin : _dot;
+							qmax = qmax > _dot ? qmax : _dot;
+						}
+					} catch (err) {
+						_didIteratorError3 = true;
+						_iteratorError3 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion3 && _iterator3.return) {
+								_iterator3.return();
+							}
+						} finally {
+							if (_didIteratorError3) {
+								throw _iteratorError3;
+							}
+						}
+					}
+
+					if (!_Math2.default.overlap(pmin, pmax, qmin, qmax)) return false;
+				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
+				}
+			}
 
 			return true;
 		}
@@ -151,7 +308,7 @@ var Rectangle2 = function () {
 		value: function intersect(tA, eA, tB, eB) {
 			var eAn = eA.n,
 			    eBn = eB.n,
-			    abs = Math.abs;
+			    abs = _Math2.default.abs;
 
 			var mT = _Matrix2.default.Inverse(tA),
 			    mTn = mT.n;
