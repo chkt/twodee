@@ -1,3 +1,4 @@
+import Math from 'xyzw/es5/Math';
 import Vector2 from 'xyzw/es5/Vector2';
 import Matrix3 from 'xyzw/es5/Matrix3';
 
@@ -9,6 +10,33 @@ import PolyLine2 from './PolyLine2';
  * Planar geometric primitive, second order
  */
 export default class Rectangle2 {
+
+	/**
+	 * Defines an instance
+	 * @constructor
+	 * @param {Matrix3} transform - The transform
+	 * @param {Vector2} extend - The extend
+	 * @param {Rectangle2} [target] - The target instance
+	 * @returns {Rectangle2}
+	 */
+	static Define(transform, extend, target) {
+		if (target === undefined) return new this(transform, extend);
+		else return this.call(target, transform, extend);
+	}
+
+	/**
+	 * Returns a new instance from w, h
+	 * @constructor
+	 * @param {number} w - The width
+	 * @param {number} h - The height
+	 * @param {Rectangle2} [target] - The target instance
+	 */
+	static Box(w, h, target) {
+		const transform = new Matrix3();
+		const extend = new Vector2([ w * 0.5, h * 0.5 ]);
+
+		return this.Define(transform, extend, target);
+	}
 
 	/**
 	 * Returns a new instance from point
@@ -83,6 +111,60 @@ export default class Rectangle2 {
 		const vP = Vector2.Multiply2x3Matrix3(mT, p);
 
 		if (eA.n[0] < Math.abs(vP.n[0]) || eA.n[1] < Math.abs(vP.n[1])) return false;
+
+		return true;
+	}
+
+	/**
+	 * Returns true if obb (t, e) intersects with triangle(p0,p1,p2)
+	 * @param {Matrix3} t - The obb transform
+	 * @param {Vector2} e - The obb extend
+	 * @param {Vector2} p0 - The first point of the triangle
+	 * @param {Vector2} p1 - The second point of the triangle
+	 * @param {Vector2} p2 - The third point of the triangle
+	 * @returns {boolean}
+	 */
+	static intersectTriangle(t, e, p0, p1, p2) {
+		const ex = e.n[0], ey = e.n[1];
+
+		const q0 = new Vector2([ex, ey]), q1 = new Vector2([ex, -ey]);
+		const q2 = new Vector2([-ex, -ey]), q3 = new Vector2([-ex, ey]);
+
+		q0.multiply2x3Matrix3(t, q0), q1.multiply2x3Matrix3(t, q1);
+		q1.multiply2x3Matrix3(t, q2), q2.multiply2x3Matrix3(t, q3);
+
+		const ps = [p0, p1, p2], qs = [q0, q1, q2, q3];
+
+		const axes = [
+			Vector2.Subtract(q1, q0),
+			Vector2.Subtract(q2, q1),
+			Vector2.Subtract(p1, p0),
+			Vector2.Subtract(p2, p1),
+			Vector2.Subtract(p0, p2)
+		];
+
+		for (let va of axes) {
+			const vax = va.n[0], vay = va.n[1];
+
+			let pmin = Math.MAX_NUMBER, pmax = -Math.MAX_NUMBER;
+			let qmin = Math.MAX_NUMBER, qmax = -Math.MAX_NUMBER;
+
+			for (let p of ps) {
+				const dot = vax * p.n[0] + vay * p.n[1];
+
+				pmin = pmin < dot ? pmin : dot;
+				pmax = pmax > dot ? pmax : dot;
+			}
+
+			for (let q of qs) {
+				const dot = vax * q.n[0] + vay * q.n[1];
+
+				qmin = qmin < dot ? qmin : dot;
+				qmax = qmax > dot ? qmax : dot;
+			}
+
+			if (!Math.overlap(pmin, pmax, qmin, qmax)) return false;
+		}
 
 		return true;
 	}
