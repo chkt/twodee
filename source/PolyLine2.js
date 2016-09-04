@@ -14,29 +14,25 @@ import Rectangle2 from './Rectangle2';
  * @returns {boolean}
  */
 function _intersectColinearSegments(p0, p1, q0, q1, r) {
-	const va = Vector2.Subtract(p1, p0);
-	let o, sp1, sq0, sq1;
-
-	if (va.y < va.x) o = p0.x, sp1 = p1.x - o, sq0 = q0.x - o, sq1 = q1.x - o;
-	else o = p0.y, sp1 = p1.y - o, sq0 = q0.y - o, sq1 = q1.y - o;
+	const va = Vector2.Subtract(p1, p0), i = Math.abs(va.n[1]) < Math.abs(va.n[0]) ? 0 : 1;
+	const o = p0.n[i], sp1 = va.n[i], sq0 = q0.n[i] - o, sq1 = q1.n[i] - o;
 
 	const [pmin, pmax] = 0.0 < sp1 ? [0.0, sp1] : [sp1, 0.0];
 	const [qmin, qmax] = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0];
 
 	if (pmax - qmin < 0 || qmax - pmin < 0) return false;
 
-	if (r) {
+	if (r !== undefined) {
 		const sr0 = Math.max(pmin, qmin) / sp1;
 		const sr1 = Math.min(pmax, qmax) / sp1;
-
-		const s = Vector2.Copy(va).multiplyScalarEQ(sr0);
+		const vs = Vector2.Copy(va).multiplyScalarEQ(sr0);
 
 		r
 			.copyOf(va)
 			.multiplyScalarEQ(sr1)
-			.subtractEQ(s)
+			.subtractEQ(vs)
 			.multiplyScalarEQ(0.5)
-			.addEQ(s)
+			.addEQ(vs)
 			.addEQ(p0);
 	}
 
@@ -165,7 +161,7 @@ export default class PolyLine2 {
 		const vC = Vector2.Subtract(p0, q0);
 		const a = Vector2.dot(vC, Vector2.Perpendicular(vA));
 
-		if (f === 0.0) return a === 0 && _intersectColinearSegments(p0, p1, q0, q1, r);
+		if (f === 0.0) return a === 0.0 && _intersectColinearSegments(p0, p1, q0, q1, r);
 
 		if (f > 0.0 && (a < 0.0 || a > f) || f < 0.0 && (a > 0.0 || a < f)) return false;
 
