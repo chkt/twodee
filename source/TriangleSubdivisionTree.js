@@ -164,36 +164,38 @@ export default class TriangleSubdivisionTree {
 		];
 	}
 
-	addPoints(points) {
-		const poly = _poly.get(this);
+	addPoint(point) {
 		const E0 = 0.01, E1 = 1.0 - E0;
+		const poly = _poly.get(this), isect = this.intersectsPoint(point);
 
-		for (let p of points) {
-			const isect = this.intersectsPoint(p);
+		if (isect === null) return -1;
 
-			if (isect === null) continue;
+		const [u, v] = isect.uv;
+		let edges;
 
-			const [u, v] = isect.uv;
-			let edges;
+		if (u > E0 && v > E0 && u + v < E1) edges = this.subdivideFace(isect.face, point);
+		else if (u === 1.0 || v === 1.0 || u + v === 0.0) return -1;
+		else {
+			const [v0, v1, v2] = poly.vertexOfFace(isect.face);
+			let edge;
 
-			if (u > E0 && v > E0 && u + v < E1) edges = this.subdivideFace(isect.face, p);
-			else if (u === 1.0 || v === 1.0 || u + v === 0.0) continue;
-			else {
-				const [v0, v1, v2] = poly.vertexOfFace(isect.face);
-				let edge;
+			if (u < E0) edge = poly.edgeOfFace(isect.face, v0)[0];
+			else if (v < E0) edge = poly.edgeOfFace(isect.face, v2)[0];
+			else edge = poly.edgeOfFace(isect.face, v1)[0];
 
-				if (u < E0) edge = poly.edgeOfFace(isect.face, v0)[0];
-				else if (v < E0) edge = poly.edgeOfFace(isect.face, v2)[0];
-				else edge = poly.edgeOfFace(isect.face, v1)[0];
-
-				edges = this.splitEdge(edge, p);
-			}
-
-			for (let item = edges.pop(); item !== undefined; item = edges.pop()) {
-				const { face, edge } = item;
-
-				if (!this.testEdge(face, edge)) edges.push(...this.turnEdge(face, edge));
-			}
+			edges = this.splitEdge(edge, point);
 		}
+
+		for (let item = edges.pop(); item !== undefined; item = edges.pop()) {
+			const { face, edge } = item;
+
+			if (!this.testEdge(face, edge)) edges.push(...this.turnEdge(face, edge));
+		}
+
+		return poly.vertexOfPoint(point);
+	}
+
+	addPoints(points) {
+		for (let p of points) this.addPoint(p);
 	}
 }
