@@ -2,7 +2,7 @@ import Vector2 from 'xyzw/es5/Vector2';
 
 import Triangle2 from './Triangle2';
 import Rectangle2 from './Rectangle2';
-import TriangeSubdivisionTree from './TriangleSubdivisionTree';
+import TriangleSubdivisionTree from './TriangleSubdivisionTree';
 
 
 
@@ -153,7 +153,7 @@ export default class Polygon2 {
 		const aabb = Rectangle2.AABB(points);
 		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 1.1);
 
-		const mesh = new TriangeSubdivisionTree(bound);
+		const mesh = new TriangleSubdivisionTree(bound);
 
 		mesh.addPoints(points);
 
@@ -371,6 +371,20 @@ export default class Polygon2 {
 		else return [f[v0 + 2], f[v0], f[v0 + 1]];
 	}
 
+	/**
+	 * Returns the ccw ordered points associated with face
+	 * Proxies {@link Polygon2#vertexOfFace}
+	 * @param {int} face - The face index
+	 * @param {Int} [edge] - The edge index of the first ccw vertex index
+	 * @returns {Vector2[]}
+	 */
+	pointOfFace(face, edge) {
+		const point = _point.get(this);
+		const [vertex0, vertex1, vertex2] = this.vertexOfFace(face, edge);
+
+		return [point[vertex0], point[vertex1], point[vertex2]];
+	}
+
 
 	/**
 	 * Returns true if edge is a defined edge index, false otherwise
@@ -405,6 +419,20 @@ export default class Polygon2 {
 
 		if (vertex === undefined || e[v0] !== vertex) return [e[v0], e[v0 + 1]];
 		else return [e[v0 + 1], e[v0]];
+	}
+
+	/**
+	 * Returns the from, to ordered points associated with edge
+	 * Proxies {@link Polygon2#vertexOfEdge}
+	 * @param {int} edge - The edge
+	 * @param {int} [vertex] - The second vertex
+	 * @returns {Vector2[]}
+	 */
+	pointOfEdge(edge, vertex) {
+		const point = _point.get(this);
+		const [vertex0, vertex1] = this.vertexOfEdge(edge, vertex);
+
+		return [point[vertex0], point[vertex1]];
 	}
 
 
@@ -462,35 +490,6 @@ export default class Polygon2 {
 		return res;
 	}
 
-
-	/**
-	 * Returns the ccw ordered points associated with face
-	 * Proxies {@link Polygon2#vertexOfFace}
-	 * @param {int} face - The face index
-	 * @param {Int} [edge] - The edge index of the first ccw vertex index
-	 * @returns {Vector2[]}
-	 */
-	pointOfFace(face, edge) {
-		const point = _point.get(this);
-		const [vertex0, vertex1, vertex2] = this.vertexOfFace(face, edge);
-
-		return [point[vertex0], point[vertex1], point[vertex2]];
-	}
-
-	/**
-	 * Returns the from, to ordered points associated with edge
-	 * Proxies {@link Polygon2#vertexOfEdge}
-	 * @param {int} edge - The edge
-	 * @param {int} [vertex] - The second vertex
-	 * @returns {Vector2[]}
-	 */
-	pointOfEdge(edge, vertex) {
-		const point = _point.get(this);
-		const [vertex0, vertex1] = this.vertexOfEdge(edge, vertex);
-
-		return [point[vertex0], point[vertex1]];
-	}
-
 	/**
 	 * Returns the point associated with vertex
 	 * @param {int} vertex - The vertex
@@ -499,6 +498,17 @@ export default class Polygon2 {
 	pointOfVertex(vertex) {
 		return _point.get(this)[vertex];
 	}
+
+
+	/**
+	 * Returns the vertex index associated with point
+	 * @param {Vector2} point - The point
+	 * @returns {int}
+	 */
+	vertexOfPoint(point) {
+		return _point.get(this).indexOf(point);
+	}
+
 
 	/**
 	 * Returns the index of the face created between vertex0, vertex1 and vertex2
@@ -585,6 +595,18 @@ export default class Polygon2 {
 
 		_vertexFree.get(this).push(vertex);
 		_point.get(this)[vertex] = null;
+	}
+
+	/**
+	 * Removes all isolated vertices
+	 * @returns {Polygon2}
+	 */
+	clearIsolatedVertices() {
+		for (let v of this.vertex) {
+			if (this.faceOfVertex(v).length === 0) this.removeVertex(v);
+		}
+
+		return this;
 	}
 
 
