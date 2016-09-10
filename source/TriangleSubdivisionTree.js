@@ -17,6 +17,12 @@ const _faceIndex = new WeakMap();
 
 
 
+/**
+ * Creates new branches in the subdivision tree
+ * @private
+ * @param {int[]} faces - the branching face indices
+ * @param {int[]} subfaces - the new subface indices
+ */
 function _treeSubdivide(faces, subfaces) {
 	const poly = _poly.get(this), tree = _tree.get(this), index = _faceIndex.get(this);
 
@@ -38,9 +44,15 @@ function _treeSubdivide(faces, subfaces) {
 }
 
 
-
+/**
+ * Delaunay triangulation subdivision tree
+ */
 export default class TriangleSubdivisionTree {
 
+	/**
+	 * Creates a new instance
+	 * @param {Triangle2} boundary - The boundary triangle
+	 */
 	constructor(boundary) {
 		const poly = new Polygon2();
 
@@ -57,6 +69,10 @@ export default class TriangleSubdivisionTree {
 	}
 
 
+	/**
+	 * Returns a dereferenced polygon representing the subdivision state
+	 * @returns {Polygon2}
+	 */
 	get poly() {
 		const poly = _poly.get(this);
 		const res = Polygon2.Copy(poly);
@@ -69,6 +85,11 @@ export default class TriangleSubdivisionTree {
 	}
 
 
+	/**
+	 * Returns the intersection face and barycentric coordinate if q intersects with the subdivision tree, null otherwise
+	 * @param {Vector2} q - The point
+	 * @returns {null|Object}
+	 */
 	intersectsPoint(q) {
 		const tree = _tree.get(this);
 		let queue = [ 0 ];
@@ -97,6 +118,12 @@ export default class TriangleSubdivisionTree {
 		return null;
 	}
 
+	/**
+	 * Returns the newly created face indices and their far edge indices after subdividing face with q
+	 * @param {int} face - The face index
+	 * @param {Vector2} q - The subdivision point
+	 * @returns {Object[]}
+	 */
 	subdivideFace(face, q) {
 		const poly = _poly.get(this);
 
@@ -112,6 +139,12 @@ export default class TriangleSubdivisionTree {
 		];
 	}
 
+	/**
+	 * Returns the newly created face indices and their far edge indices after splitting edge with q
+	 * @param {int} edge - The edge index
+	 * @param {Vector2} q - The splitting point
+	 * @returns {Object[]}
+	 */
 	splitEdge(edge, q) {
 		const poly = _poly.get(this);
 		const [face0, face1] = poly.faceOfEdge(edge);
@@ -136,6 +169,12 @@ export default class TriangleSubdivisionTree {
 		];
 	}
 
+	/**
+	 * Returns true if edge is the optimal edge for the quad of face0 and the face opposite of edge, false otherwise
+	 * @param {int} face0 - The face index of the first face
+	 * @param {int} edge - The edge index of the edge
+	 * @returns {boolean}
+	 */
 	testEdge(face0, edge) {
 		const poly = _poly.get(this);
 		const face1 = poly.faceOfEdge(edge, face0)[0];
@@ -148,6 +187,13 @@ export default class TriangleSubdivisionTree {
 		return !Triangle2.intersectPointCircumcircle(p0, p1, p2, p3);
 	}
 
+	/**
+	 * Returns the newly created face indices and their face edge indices
+	 * after turning the edge of the quad of face0 and the face opposite of edge
+	 * @param {int} face0 - The face index of the first face
+	 * @param {int} edge - The edge index of the edge
+	 * @returns {*[]}
+	 */
 	turnEdge(face0, edge) {
 		const poly = _poly.get(this), tree = _tree.get(this);
 		const face1 = poly.faceOfEdge(edge, face0)[0];
@@ -164,17 +210,21 @@ export default class TriangleSubdivisionTree {
 		];
 	}
 
+	/**
+	 * Adds a point to the subdivision mesh
+	 * @param {Vector2} point - The point
+	 */
 	addPoint(point) {
 		const E0 = 0.01, E1 = 1.0 - E0;
 		const poly = _poly.get(this), isect = this.intersectsPoint(point);
 
-		if (isect === null) return -1;
+		if (isect === null) return;
 
 		const [u, v] = isect.uv;
 		let edges;
 
 		if (u > E0 && v > E0 && u + v < E1) edges = this.subdivideFace(isect.face, point);
-		else if (u === 1.0 || v === 1.0 || u + v === 0.0) return -1;
+		else if (u === 1.0 || v === 1.0 || u + v === 0.0) return;
 		else {
 			const [v0, v1, v2] = poly.vertexOfFace(isect.face);
 			let edge;
@@ -191,10 +241,12 @@ export default class TriangleSubdivisionTree {
 
 			if (!this.testEdge(face, edge)) edges.push(...this.turnEdge(face, edge));
 		}
-
-		return poly.vertexOfPoint(point);
 	}
 
+	/**
+	 * Adds points to the subdivision mesh
+	 * @param {Vector2[]} points - The points
+	 */
 	addPoints(points) {
 		for (let p of points) this.addPoint(p);
 	}
