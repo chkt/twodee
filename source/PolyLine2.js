@@ -144,6 +144,34 @@ export default class PolyLine2 {
 
 
 	/**
+	 * Returns true if point q0 intersects poly line pN, false otherwise
+	 * Using the crossings test (RRp754)
+	 * @param {Vector2[]} pN - The poly line segments
+	 * @param {Vector2} q0 - The point
+	 * @returns {boolean}
+	 */
+	static intersectPoint(pN, q0) {
+		const len = pN.length, q0y = q0.n[1];
+		let res = false;
+
+		let e0 = pN[len - 1], y0 = e0.y >= q0y;
+
+		for (let i = len - 2; i > -1; i -= 1) {
+			const e1 = pN[i], e1y = e1.n[1], y1 = e1y >= q0y;
+
+			if (
+				y1 !== y0 &&
+				((e1y - q0y) * (e0.n[0] - e1.n[0]) >= (e1.n[0] - q0.n[0]) * (e0.n[1] - e1y)) === y1
+			) res = !res;
+
+			e0 = e1, y0 = y1;
+		}
+
+		return res;
+	}
+
+
+	/**
 	 * Returns true if segment (p0,p1) intersects segment (q0,q1), false otherwise (RRp781)
 	 * @param {Vector2} p0 - The first point of the first segment
 	 * @param {Vector2} p1 - The second point of the first segment
@@ -254,6 +282,16 @@ export default class PolyLine2 {
 		return this.point[0] === this.point[this.point.length - 1];
 	}
 
+
+	/**
+	 * Returns true if the instance intersects with point, false otherwise
+	 * Alias for {@link PolyLine2.intersectsPoint}
+	 * @param {Vector2} point - The antagonist
+	 * @returns {boolean}
+	 */
+	intersectsPoint(point) {
+		return PolyLine2.intersectPoint(this.point, point);
+	}
 
 	/**
 	 * Returns true if the instance intersects with poly, false otherwise
