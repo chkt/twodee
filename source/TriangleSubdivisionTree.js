@@ -5,6 +5,13 @@ import Polygon2 from './Polygon2';
 
 
 
+const FLAG_NONE = 0b0;
+const FLAG_FACE_IMMUTABLE = 0b01;
+const FLAG_FACE_INVALID = 0b10;
+const FLAG_EDGE_IMMUTABLE = 0b1;
+const FLAG_VERTEX_INVALID = 0b1;
+
+
 const SIZE = 7;
 const SUB0 = 0, SUB1 = 1, SUB2 = 2, P0 = 4, P1 = 5, P2 = 6, FACE = 3;
 
@@ -15,6 +22,93 @@ const _poly = new WeakMap();
 const _tree = new WeakMap();
 const _faceIndex = new WeakMap();
 
+const _faceFlags = new WeakMap();
+const _edgeFlags = new WeakMap();
+const _vertexFlags = new WeakMap();
+
+
+/**
+ * Returns true if face has flag, false otherwise
+ * @private
+ * @param {int} face - The face index
+ * @param {int} flag - The face flag
+ * @returns {boolean}
+ */
+function _hasFaceFlag(face, flag) {
+	const flags = _faceFlags.get(this);
+
+	return face in flags && flags[face] & flag !== 0;
+}
+
+/**
+ * Sets flag for face
+ * @private
+ * @param {int} face - The face index
+ * @param {int} flag - The face flag
+ */
+function _setFaceFlag(face, flag) {
+	const flags = _faceFlags.get(this);
+
+	if (!(face in flags)) flags[face] = FLAG_NONE;
+
+	flags[face] |= flag;
+}
+
+
+/**
+ * Returns true if edge has flag, false, otherwise
+ * @private
+ * @param {int} edge - The edge index
+ * @param {int} flag - The edge flag
+ * @returns {boolean}
+ */
+function _hasEdgeFlag(edge, flag) {
+	const flags = _edgeFlags.get(this);
+
+	return edge in flags && flags[edge] & flag !== 0;
+}
+
+/**
+ * Sets flag for edge
+ * @private
+ * @param {int} edge - The edge index
+ * @param {int} flag - The edge flag
+ */
+function _setEdgeFlag(edge, flag) {
+	const flags = _edgeFlags.get(this);
+
+	if (!(edge in flags)) flags[edge] = FLAG_NONE;
+
+	flags[edge] |= flag;
+}
+
+
+/**
+ * Returns true if vertex has flag, false otherwise
+ * @private
+ * @param {int} vertex - The vertex index
+ * @param {int} flag - The vertex flag
+ * @returns {boolean}
+ */
+function _hasVertexFlag(vertex, flag) {
+	const flags = _vertexFlags.get(this);
+
+	return vertex in flags && flags[vertex] & flag !== 0;
+}
+
+/**
+ * Sets flag for vertex
+ * @private
+ * @param {int} vertex - The vertex index
+ * @param {int} flag - The vertex flag
+ */
+function _setVertexFlag(vertex, flag) {
+	const flags = _vertexFlags.get(this);
+
+	if (!(vertex in flags)) flags[vertex] = FLAG_NONE;
+
+	flags[vertex] |= flag;
+}
 
 
 /**
@@ -144,6 +238,14 @@ export default class TriangleSubdivisionTree {
 
 		_tree.set(this, [-1, -1, -1, f0, boundary.p0, boundary.p1, boundary.p2]);
 		_faceIndex.set(this, [0]);
+
+		_faceFlags.set(this, {});
+		_edgeFlags.set(this, {});
+		_vertexFlags.set(this, {
+			[ v0 ] : FLAG_VERTEX_INVALID,
+			[ v1 ] : FLAG_VERTEX_INVALID,
+			[ v2 ] : FLAG_VERTEX_INVALID
+		});
 	}
 
 
@@ -155,9 +257,13 @@ export default class TriangleSubdivisionTree {
 		const poly = _poly.get(this);
 		const res = Polygon2.Copy(poly);
 
-		res.removeVertex(0);
-		res.removeVertex(1);
-		res.removeVertex(2);
+		for (let face in _faceFlags.get(this)) {
+			if (_hasFaceFlag.call(this, face, FLAG_FACE_INVALID)) res.removeFace(face);
+		}
+
+		for (let vertex in _vertexFlags.get(this)) {
+			if (_hasVertexFlag.call(this, vertex, FLAG_VERTEX_INVALID)) res.removeVertex(vertex);
+		}
 
 		return res;
 	}
