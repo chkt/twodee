@@ -45,6 +45,84 @@ function _treeSubdivide(faces, subfaces) {
 
 
 /**
+ * Returns the newly created face indices and their far edge indices after subdividing face with q
+ * @private
+ * @param {int} face - The face index
+ * @param {Vector2} q - The subdivision point
+ * @returns {Object[]}
+ */
+function _faceSubdivide(face, q) {
+	const poly = _poly.get(this);
+
+	const v3 = poly.subdivideFace(face, q);
+	const [f0, f1, f2] = poly.faceOfVertex(v3);
+
+	_treeSubdivide.call(this, [ face ], [ f0, f1, f2 ]);
+
+	return [
+		{ face : f0, edge : poly.edgeOfFace(f0, v3)[1] },
+		{ face : f1, edge : poly.edgeOfFace(f1, v3)[1] },
+		{ face : f2, edge : poly.edgeOfFace(f2, v3)[1] }
+	];
+}
+
+/**
+ * Returns the newly created face indices and their far edge indices after splitting edge with q
+ * @private
+ * @param {int} edge - The edge index
+ * @param {Vector2} q - The splitting point
+ * @returns {Object[]}
+ */
+function _edgeSplit(edge, q) {
+	const poly = _poly.get(this);
+	const [face0, face1] = poly.faceOfEdge(edge);
+	const [p0, p1, p2] = poly.pointOfFace(face0, edge);
+
+	q = Vector2
+		.Subtract(p1, p0)
+		.projectEQ(Vector2.Subtract(q, p0))
+		.addEQ(p1);
+
+	const v4 = poly.splitEdge(edge, q);
+	const [f0, f1, f2, f3] = poly.faceOfVertex(v4);
+
+	_treeSubdivide.call(this, [ face0 ], [ f3, f2 ]);
+	_treeSubdivide.call(this, [ face1 ], [ f1, f0 ]);
+
+	return [
+		{ face : f0, edge : poly.edgeOfFace(f0, v4)[1] },
+		{ face : f1, edge : poly.edgeOfFace(f1, v4)[1] },
+		{ face : f2, edge : poly.edgeOfFace(f2, v4)[1] },
+		{ face : f3, edge : poly.edgeOfFace(f3, v4)[1] }
+	];
+}
+
+/**
+ * Returns the newly created face indices and their face edge indices
+ * after turning the edge of the quad of face0 and the face opposite of edge
+ * @private
+ * @param {int} face0 - The face index of the first face
+ * @param {int} edge - The edge index of the edge
+ * @returns {*[]}
+ */
+function _edgeTurn(face0, edge) {
+	const poly = _poly.get(this), tree = _tree.get(this);
+	const face1 = poly.faceOfEdge(edge, face0)[0];
+	const [v0, v1, v2] = poly.vertexOfFace(face0, edge);
+
+	const e0 = poly.turnEdge(edge);
+	const [f0, f1] = poly.faceOfEdge(e0);
+
+	_treeSubdivide.call(this, [ face0, face1 ], [ f0, f1 ]);
+
+	return [
+		{ face : f0, edge : poly.edgeOfFace(f0, v2)[1] },
+		{ face : f1, edge : poly.edgeOfFace(f1, v2)[1] }
+	];
+}
+
+
+/**
  * Delaunay triangulation subdivision tree
  */
 export default class TriangleSubdivisionTree {
@@ -119,57 +197,6 @@ export default class TriangleSubdivisionTree {
 	}
 
 	/**
-	 * Returns the newly created face indices and their far edge indices after subdividing face with q
-	 * @param {int} face - The face index
-	 * @param {Vector2} q - The subdivision point
-	 * @returns {Object[]}
-	 */
-	subdivideFace(face, q) {
-		const poly = _poly.get(this);
-
-		const v3 = poly.subdivideFace(face, q);
-		const [f0, f1, f2] = poly.faceOfVertex(v3);
-
-		_treeSubdivide.call(this, [ face ], [ f0, f1, f2 ]);
-
-		return [
-			{ face : f0, edge : poly.edgeOfFace(f0, v3)[1] },
-			{ face : f1, edge : poly.edgeOfFace(f1, v3)[1] },
-			{ face : f2, edge : poly.edgeOfFace(f2, v3)[1] }
-		];
-	}
-
-	/**
-	 * Returns the newly created face indices and their far edge indices after splitting edge with q
-	 * @param {int} edge - The edge index
-	 * @param {Vector2} q - The splitting point
-	 * @returns {Object[]}
-	 */
-	splitEdge(edge, q) {
-		const poly = _poly.get(this);
-		const [face0, face1] = poly.faceOfEdge(edge);
-		const [p0, p1, p2] = poly.pointOfFace(face0, edge);
-
-		q = Vector2
-			.Subtract(p1, p0)
-			.projectEQ(Vector2.Subtract(q, p0))
-			.addEQ(p1);
-
-		const v4 = poly.splitEdge(edge, q);
-		const [f0, f1, f2, f3] = poly.faceOfVertex(v4);
-
-		_treeSubdivide.call(this, [ face0 ], [ f3, f2 ]);
-		_treeSubdivide.call(this, [ face1 ], [ f1, f0 ]);
-
-		return [
-			{ face : f0, edge : poly.edgeOfFace(f0, v4)[1] },
-			{ face : f1, edge : poly.edgeOfFace(f1, v4)[1] },
-			{ face : f2, edge : poly.edgeOfFace(f2, v4)[1] },
-			{ face : f3, edge : poly.edgeOfFace(f3, v4)[1] }
-		];
-	}
-
-	/**
 	 * Returns true if edge is the optimal edge for the quad of face0 and the face opposite of edge, false otherwise
 	 * @param {int} face0 - The face index of the first face
 	 * @param {int} edge - The edge index of the edge
@@ -187,28 +214,6 @@ export default class TriangleSubdivisionTree {
 		return !Triangle2.intersectPointCircumcircle(p0, p1, p2, p3);
 	}
 
-	/**
-	 * Returns the newly created face indices and their face edge indices
-	 * after turning the edge of the quad of face0 and the face opposite of edge
-	 * @param {int} face0 - The face index of the first face
-	 * @param {int} edge - The edge index of the edge
-	 * @returns {*[]}
-	 */
-	turnEdge(face0, edge) {
-		const poly = _poly.get(this), tree = _tree.get(this);
-		const face1 = poly.faceOfEdge(edge, face0)[0];
-		const [v0, v1, v2] = poly.vertexOfFace(face0, edge);
-
-		const e0 = poly.turnEdge(edge);
-		const [f0, f1] = poly.faceOfEdge(e0);
-
-		_treeSubdivide.call(this, [ face0, face1 ], [ f0, f1 ]);
-
-		return [
-			{ face : f0, edge : poly.edgeOfFace(f0, v2)[1] },
-			{ face : f1, edge : poly.edgeOfFace(f1, v2)[1] }
-		];
-	}
 
 	/**
 	 * Adds a point to the subdivision mesh
@@ -223,7 +228,7 @@ export default class TriangleSubdivisionTree {
 		const [u, v] = isect.uv;
 		let edges;
 
-		if (u > E0 && v > E0 && u + v < E1) edges = this.subdivideFace(isect.face, point);
+		if (u > E0 && v > E0 && u + v < E1) edges = _faceSubdivide.call(this, isect.face, point);
 		else if (u === 1.0 || v === 1.0 || u + v === 0.0) return;
 		else {
 			const [v0, v1, v2] = poly.vertexOfFace(isect.face);
@@ -233,13 +238,13 @@ export default class TriangleSubdivisionTree {
 			else if (v < E0) edge = poly.edgeOfFace(isect.face, v2)[0];
 			else edge = poly.edgeOfFace(isect.face, v1)[0];
 
-			edges = this.splitEdge(edge, point);
+			edges = _edgeSplit.call(this, edge, point);
 		}
 
 		for (let item = edges.pop(); item !== undefined; item = edges.pop()) {
 			const { face, edge } = item;
 
-			if (!this.testEdge(face, edge)) edges.push(...this.turnEdge(face, edge));
+			if (!this.testEdge(face, edge)) edges.push(..._edgeTurn.call(this, face, edge));
 		}
 	}
 
