@@ -212,7 +212,7 @@ export default class Polygon2 {
 
 		const mesh = new TriangleSubdivisionTree(bound);
 
-		mesh.addOutline(outline);
+		mesh.intersectOutline(outline);
 
 		return mesh.poly;
 	}
@@ -242,7 +242,9 @@ export default class Polygon2 {
 		const p = _point.get(poly);
 		const q = [];
 
-		for (let point of p) q.push(Vector2.Copy(point));
+		for (let i = p.length - 1; i > -1; i -= 1) {
+			if (i in p) q[i] = Vector2.Copy(p[i]);
+		}
 
 		_point.set(target, q);
 
@@ -335,7 +337,9 @@ export default class Polygon2 {
 	get indexList() {
 		const face = _face.get(this), res = [];
 
-		for (let v0 = 3, l = face.length; v0 < l; v0 += 6) res.push(face[v0], face[v0 + 1], face[v0 + 2]);
+		for (let v0 = 3, l = face.length; v0 < l; v0 += 6) {
+			if (face[v0] !== -1) res.push(face[v0], face[v0 + 1], face[v0 + 2]);
+		}
 
 		return res;
 	}
@@ -651,7 +655,8 @@ export default class Polygon2 {
 		v[e0] = v[e0 + 1] = -1;
 
 		_vertexFree.get(this).push(vertex);
-		_point.get(this)[vertex] = null;
+
+		delete _point.get(this)[vertex];
 	}
 
 	/**
@@ -760,13 +765,14 @@ export default class Polygon2 {
 
 		const uv = fuv !== undefined ? [] : undefined;
 
-		for (let i = f.length - 1; i > -1; i -= 1) {
-			const v0 = i * 6 + 3;
+		for (let v0 = f.length - 3; v0 > -1; v0 -= 6) {
+			if (f[v0] === -1) continue;
+
 			const p0 = point[f[v0]], p1 = point[f[v0 + 1]], p2 = point[f[v0 + 2]];
 
 			if (!Triangle2.intersectPoint(p0, p1, p2, q, uv)) continue;
 
-			if (fuv !== undefined) fuv.splice(0, fuv.length, i, ...uv);
+			if (fuv !== undefined) fuv.splice(0, fuv.length, (v0 - 3) / 6, ...uv);
 
 			return true;
 		}
@@ -784,9 +790,13 @@ export default class Polygon2 {
 		const pA = _point.get(this), pB = _point.get(poly);
 
 		for (let vA0 = fA.length - 3; vA0 > -1; vA0 -= 6) {
+			if (fA[vA0] === -1) continue;
+
 			const pA0 = pA[fA[vA0]], pA1 = pA[fA[vA0 + 1]], pA2 = pA[fA[vA0 + 2]];
 
 			for (let vB0 = fB.length - 3; vB0 > -1; vB0 -= 6) {
+				if (fB[vB0] === -1) continue;
+
 				const pB0 = pB[fB[vB0]], pB1 = pB[fB[vB0 + 1]], pB2 = pB[fB[vB0 + 2]];
 
 				if (Triangle2.intersect(pA0, pA1, pA2, pB0, pB1, pB2)) return true;
@@ -828,6 +838,8 @@ export default class Polygon2 {
 		const point = _point.get(this);
 
 		for (let i = point.length - 1; i > -1; i -= 1) {
+			if (!(i in point)) continue;
+
 			const p = point[i];
 
 			Vector2.Multiply2x3Matrix3(transform, p, p);
