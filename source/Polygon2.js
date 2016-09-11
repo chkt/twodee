@@ -183,22 +183,36 @@ export default class Polygon2 {
 
 	/**
 	 * Returns an instance from points
-	 * Using Delaunay Triangulation
+	 * Using TriangleSubdivisionTree
 	 * @constructor
 	 * @param {Vector2[]} points - The points
-	 * @param {Polygon2} [target] - The target instance
 	 * @returns {Polygon2}
 	 */
-	static Points(points, target) {
-		if (target === undefined) target = new Polygon2();
-		else target.define();
-
+	static Points(points) {
 		const aabb = Rectangle2.AABB(points);
-		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 1.1);
+		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
 
 		const mesh = new TriangleSubdivisionTree(bound);
 
 		mesh.addPoints(points);
+
+		return mesh.poly;
+	}
+
+	/**
+	 * Returns an instance from outline
+	 * Using TriangleSubdivisionTree
+	 * @constructor
+	 * @param {PolyLine2} outline - The outline
+	 * @returns {Polygon2}
+	 */
+	static PolyLine2(outline) {
+		const aabb = Rectangle2.AABB(outline.point);
+		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
+
+		const mesh = new TriangleSubdivisionTree(bound);
+
+		mesh.addOutline(outline);
 
 		return mesh.poly;
 	}
