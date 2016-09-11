@@ -23,7 +23,7 @@ function _createQuad(poly) {
 
 
 describe('Polygon2', () => {
-	describe('createFace', () => {
+	describe('#createFace', () => {
 		it("should create triangles", () => {
 			const poly = new Polygon2();
 
@@ -49,7 +49,30 @@ describe('Polygon2', () => {
 		});
 	});
 
-	describe('turnEdge', () => {
+	describe('#splitEdge', () => {
+		it("should split the specified edge", () => {
+			const poly = new Polygon2();
+			const [v0, v1, v2, v3] = _createQuad(poly);
+
+			const p = new Vector2([0.5, 0.5]);
+			const edge = poly.edgeOfVertex(v1, [ v2 ])[0];
+
+			const v4 = poly.splitEdge(edge, p);
+
+			assert.strictEqual(poly.faceOfVertex(v0).length, 2);
+			assert.strictEqual(poly.edgeOfVertex(v0).length, 3);
+			assert.strictEqual(poly.faceOfVertex(v1).length, 2);
+			assert.strictEqual(poly.edgeOfVertex(v1).length, 3);
+			assert.strictEqual(poly.faceOfVertex(v2).length, 2);
+			assert.strictEqual(poly.edgeOfVertex(v2).length, 3);
+			assert.strictEqual(poly.faceOfVertex(v3).length, 2);
+			assert.strictEqual(poly.edgeOfVertex(v3).length, 3);
+			assert.strictEqual(poly.faceOfVertex(v4).length, 4);
+			assert.strictEqual(poly.edgeOfVertex(v4).length, 4);
+		});
+	});
+
+	describe('#turnEdge', () => {
 		it("should turn the specified edge", () => {
 			const poly = new Polygon2();
 			const [v0, v1, v2] = _createQuad(poly);
@@ -64,7 +87,7 @@ describe('Polygon2', () => {
 		});
 	});
 
-	describe('intersects', () => {
+	describe('#intersects', () => {
 		it("should detect intersections between instances", () => {
 			const polyA = new Polygon2();
 			const polyB = new Polygon2();
