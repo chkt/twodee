@@ -1,13 +1,16 @@
 {
 	"name" : "twodee",
 	"description" : "Two dimensional geometry manipulation",
-	"version" : "0.1.2",
+	"version" : "0.2.0",
 	"license" : "MIT",
 
 	"keywords" : [
 		"geometry",
 		"2d",
+		"intersection",
 		"collision",
+		"ray",
+		"circle",
 		"triangle",
 		"rectangle",
 		"mesh",
