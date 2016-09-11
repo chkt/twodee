@@ -1,6 +1,7 @@
 import Vector2 from 'xyzw/es5/Vector2';
 
 import Triangle2 from './Triangle2';
+import PolyLine2 from './PolyLine2';
 import Polygon2 from './Polygon2';
 
 
@@ -170,12 +171,6 @@ function _faceSubdivide(face, q) {
 function _edgeSplit(edge, q) {
 	const poly = _poly.get(this);
 	const [face0, face1] = poly.faceOfEdge(edge);
-	const [p0, p1, p2] = poly.pointOfFace(face0, edge);
-
-	q = Vector2
-		.Subtract(p1, p0)
-		.projectEQ(Vector2.Subtract(q, p0))
-		.addEQ(p1);
 
 	const v4 = poly.splitEdge(edge, q);
 	const [f0, f1, f2, f3] = poly.faceOfVertex(v4);
@@ -197,7 +192,7 @@ function _edgeSplit(edge, q) {
  * @private
  * @param {int} face0 - The face index of the first face
  * @param {int} edge - The edge index of the edge
- * @returns {*[]}
+ * @returns {Object[]}
  */
 function _edgeTurn(face0, edge) {
 	const poly = _poly.get(this), tree = _tree.get(this);
@@ -257,11 +252,15 @@ export default class TriangleSubdivisionTree {
 		const poly = _poly.get(this);
 		const res = Polygon2.Copy(poly);
 
-		for (let face in _faceFlags.get(this)) {
+		for (let prop in _faceFlags.get(this)) {
+			const face = Number.parseInt(prop);
+
 			if (_hasFaceFlag.call(this, face, FLAG_FACE_INVALID)) res.removeFace(face);
 		}
 
-		for (let vertex in _vertexFlags.get(this)) {
+		for (let prop in _vertexFlags.get(this)) {
+			const vertex = Number.parseInt(prop);
+
 			if (_hasVertexFlag.call(this, vertex, FLAG_VERTEX_INVALID)) res.removeVertex(vertex);
 		}
 
@@ -329,7 +328,7 @@ export default class TriangleSubdivisionTree {
 		const E0 = 0.01, E1 = 1.0 - E0;
 		const poly = _poly.get(this), isect = this.intersectsPoint(point);
 
-		if (isect === null) return;
+		if (isect === null || _hasFaceFlag.call(this, isect.face, FLAG_FACE_IMMUTABLE)) return;
 
 		const [u, v] = isect.uv;
 		let edges;
@@ -344,13 +343,18 @@ export default class TriangleSubdivisionTree {
 			else if (v < E0) edge = poly.edgeOfFace(isect.face, v2)[0];
 			else edge = poly.edgeOfFace(isect.face, v1)[0];
 
+			if (_hasEdgeFlag.call(this, edge, FLAG_EDGE_IMMUTABLE)) return;
+
 			edges = _edgeSplit.call(this, edge, point);
 		}
 
 		for (let item = edges.pop(); item !== undefined; item = edges.pop()) {
 			const { face, edge } = item;
 
-			if (!this.testEdge(face, edge)) edges.push(..._edgeTurn.call(this, face, edge));
+			if (
+				!_hasEdgeFlag.call(this, edge, FLAG_EDGE_IMMUTABLE) &&
+				!this.testEdge(face, edge)
+			) edges.push(..._edgeTurn.call(this, face, edge));
 		}
 	}
 
@@ -360,5 +364,41 @@ export default class TriangleSubdivisionTree {
 	 */
 	addPoints(points) {
 		for (let p of points) this.addPoint(p);
+	}
+
+
+	/**
+	 * Intersects outline with the subdivision mesh
+	 * @param {PolyLine2} outline - The outline
+	 */
+	intersectOutline(outline) {
+		const poly = _poly.get(this), point = outline.point;
+		let v0 = -1;
+
+		for (let i = point.length - 1; i > -1; i -= 1) {
+			if (v0 === -1) {
+				const p0 = point[i];
+
+				this.addPoint(p0);
+				v0 = poly.vertexOfPoint(p0);
+			}
+			else {
+				const p1 = point[i];
+
+				this.addPoint(p1);
+
+				const v1 = poly.vertexOfPoint(p1);
+
+				if (v1 !== -1) _setEdgeFlag.call(this, poly.edgeOfVertex(v1, [v0])[0], FLAG_EDGE_IMMUTABLE);
+
+				v0 = v1;
+			}
+		}
+
+		for (let face of poly.face) {
+			const center = Triangle2.centroid(...poly.pointOfFace(face));
+
+			if (!PolyLine2.intersectPoint(point, center)) _setFaceFlag.call(this, face, FLAG_FACE_IMMUTABLE | FLAG_FACE_INVALID);
+		}
 	}
 }
