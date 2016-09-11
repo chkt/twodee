@@ -179,6 +179,37 @@ var PolyLine2 = function () {
 		}
 
 		/**
+   * Returns true if point q0 intersects poly line pN, false otherwise
+   * Using the crossings test (RRp754)
+   * @param {Vector2[]} pN - The poly line segments
+   * @param {Vector2} q0 - The point
+   * @returns {boolean}
+   */
+
+	}, {
+		key: 'intersectPoint',
+		value: function intersectPoint(pN, q0) {
+			var len = pN.length,
+			    q0y = q0.n[1];
+			var res = false;
+
+			var e0 = pN[len - 1],
+			    y0 = e0.y >= q0y;
+
+			for (var i = len - 2; i > -1; i -= 1) {
+				var e1 = pN[i],
+				    e1y = e1.n[1],
+				    y1 = e1y >= q0y;
+
+				if (y1 !== y0 && (e1y - q0y) * (e0.n[0] - e1.n[0]) >= (e1.n[0] - q0.n[0]) * (e0.n[1] - e1y) === y1) res = !res;
+
+				e0 = e1, y0 = y1;
+			}
+
+			return res;
+		}
+
+		/**
    * Returns true if segment (p0,p1) intersects segment (q0,q1), false otherwise (RRp781)
    * @param {Vector2} p0 - The first point of the first segment
    * @param {Vector2} p1 - The second point of the first segment
@@ -288,8 +319,18 @@ var PolyLine2 = function () {
    */
 
 	}, {
-		key: 'intersects',
+		key: 'intersectsPoint',
 
+
+		/**
+   * Returns true if the instance intersects with point, false otherwise
+   * Alias for {@link PolyLine2.intersectsPoint}
+   * @param {Vector2} point - The antagonist
+   * @returns {boolean}
+   */
+		value: function intersectsPoint(point) {
+			return PolyLine2.intersectPoint(this.point, point);
+		}
 
 		/**
    * Returns true if the instance intersects with poly, false otherwise
@@ -299,6 +340,9 @@ var PolyLine2 = function () {
    * References the intersection points if polylines intersect
    * @returns {boolean}
    */
+
+	}, {
+		key: 'intersects',
 		value: function intersects(poly, point) {
 			return PolyLine2.intersect(this.point, poly.point, point);
 		}

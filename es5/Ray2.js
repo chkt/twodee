@@ -129,24 +129,6 @@ var Ray2 = function () {
 			if (r !== undefined) r.copyOf(oa).multiplyScalarEQ(a / f).addEQ(pa);
 
 			return true;
-
-			// const pan = pa.n, oan = oa.n, q0n = q0.n;
-			// const ql = Vector2.Subtract(q1, q0), qlx = ql.n[0], qly = ql.n[1];
-			//
-			// const u = (pan[1] * qlx - pan[0] * qly + q0n[0] * qly - q0n[1] * qlx) / (oan[0] * qly - oan[1] * qlx);
-			//
-			// if (u < 0.0) return false;
-			//
-			// const v = (pan[0] + oan[0] * u - q0n[0]) / qlx;
-			//
-			// if (v < 0.0 || v > 1.0) return false;
-			//
-			// if (r !== undefined) r
-			// 	.copyOf(oa)
-			// 	.multiplyScalarEQ(u)
-			// 	.addEQ(pa);
-			//
-			// return true;
 		}
 
 		/**
@@ -179,24 +161,6 @@ var Ray2 = function () {
 			if (r !== undefined) r.copyOf(oa).multiplyScalarEQ(a / f).addEQ(pa);
 
 			return true;
-
-			// const pan = pa.n, oan = oa.n, pbn = pb.n;
-			// const obx = ob.n[0], oby = ob.n[1];
-			//
-			// const u = (pan[1] * obx - pan[0] * oby + pbn[0] * oby - pbn[1] * obx) / (oan[0] * oby - oan[1] * obx);
-			//
-			// if (u < 0) return false;
-			//
-			// const v = (pan[0] + oan[0] * u - pbn[0]) / obx;
-			//
-			// if (v < 0) return false;
-			//
-			// if (r !== undefined) r
-			// 	.copyOf(oa)
-			// 	.multiplyScalarEQ(u)
-			// 	.addEQ(pa);
-			//
-			// return true;
 		}
 
 		/**

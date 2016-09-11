@@ -42,6 +42,11 @@ var _vertexEdgeDirty = new WeakMap();
 
 var _point = new WeakMap();
 
+/**
+ * Returns a free face index
+ * @private
+ * @returns {int}
+ */
 function _getFreeFace() {
 	var ff = _faceFree.get(this);
 	var index = ff.shift();
@@ -56,6 +61,11 @@ function _getFreeFace() {
 	return index;
 }
 
+/**
+ * Returns a free edge index
+ * @private
+ * @returns {int}
+ */
 function _getFreeEdge() {
 	var ef = _edgeFree.get(this);
 	var index = ef.shift();
@@ -70,6 +80,11 @@ function _getFreeEdge() {
 	return index;
 }
 
+/**
+ * Returns a free vertex index
+ * @private
+ * @returns {int}
+ */
 function _getFreeVertex() {
 	var vf = _vertexFree.get(this);
 	var index = vf.shift();
@@ -84,11 +99,19 @@ function _getFreeVertex() {
 	return index;
 }
 
+/**
+ * Returns the index of the edge created from vertex0 and vertex1
+ * @private
+ * @param {int} vertex0 - The first vertex index
+ * @param {int} vertex1 - the second vertex index
+ * @returns {int}
+ */
 function _createEdge(vertex0, vertex1) {
 	var e = _edge.get(this);
 	var index = _getFreeEdge.call(this);
 
 	var v0 = index * 4 + 2;
+
 	e[v0] = vertex0, e[v0 + 1] = vertex1;
 
 	_addVertexEdge.call(this, vertex0, index);
@@ -97,6 +120,11 @@ function _createEdge(vertex0, vertex1) {
 	return index;
 }
 
+/**
+ * Removes the edge
+ * @private
+ * @param {int} edge - The edge index
+ */
 function _removeEdge(edge) {
 	var e = _edge.get(this),
 	    f0 = edge * 4;
@@ -111,6 +139,12 @@ function _removeEdge(edge) {
 	_edgeFree.get(this).push(edge);
 }
 
+/**
+ * Adds a vertex-edge relation to vertex
+ * @private
+ * @param {int} vertex - The vertex index
+ * @param {int} edge - The edge index
+ */
 function _addVertexEdge(vertex, edge) {
 	var v = _vertex.get(this),
 	    vE = _vertexEdge.get(this);
@@ -129,6 +163,12 @@ function _addVertexEdge(vertex, edge) {
 	if (dirty / tot > 0.33) _updateVertexEdge.call(this);
 }
 
+/**
+ * Removes a vertex-edge relation from vertex
+ * @private
+ * @param {int} vertex - The vertex index
+ * @param {int} edge - The edge index
+ */
 function _removeVertexEdge(vertex, edge) {
 	var v = _vertex.get(this),
 	    vE = _vertexEdge.get(this);
@@ -150,6 +190,10 @@ function _removeVertexEdge(vertex, edge) {
 	if (dirty / tot > 0.33) _updateVertexEdge.call(this);
 }
 
+/**
+ * Updates all vertex-edge indices
+ * @private
+ */
 function _updateVertexEdge() {
 	var v = _vertex.get(this),
 	    vE = [],
@@ -177,21 +221,39 @@ var Polygon2 = function () {
 
 		/**
    * Returns an instance from points
-   * Using Delaunay Triangulation
+   * Using TriangleSubdivisionTree
    * @constructor
    * @param {Vector2[]} points - The points
-   * @param {Polygon2} [target] - The target instance
    * @returns {Polygon2}
    */
-		value: function Points(points, target) {
-			if (target === undefined) target = new Polygon2();else target.define();
-
+		value: function Points(points) {
 			var aabb = _Rectangle2.default.AABB(points);
-			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm, 0.0, 1.1);
+			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
 
 			var mesh = new _TriangleSubdivisionTree2.default(bound);
 
 			mesh.addPoints(points);
+
+			return mesh.poly;
+		}
+
+		/**
+   * Returns an instance from outline
+   * Using TriangleSubdivisionTree
+   * @constructor
+   * @param {PolyLine2} outline - The outline
+   * @returns {Polygon2}
+   */
+
+	}, {
+		key: 'PolyLine2',
+		value: function PolyLine2(outline) {
+			var aabb = _Rectangle2.default.AABB(outline.point);
+			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
+
+			var mesh = new _TriangleSubdivisionTree2.default(bound);
+
+			mesh.addOutline(outline);
 
 			return mesh.poly;
 		}
@@ -343,6 +405,31 @@ var Polygon2 = function () {
 		}
 
 		/**
+   * Returns the ccw ordered points associated with face
+   * Proxies {@link Polygon2#vertexOfFace}
+   * @param {int} face - The face index
+   * @param {Int} [edge] - The edge index of the first ccw vertex index
+   * @returns {Vector2[]}
+   */
+
+	}, {
+		key: 'pointOfFace',
+		value: function pointOfFace(face, edge) {
+			var point = _point.get(this);
+
+			var _vertexOfFace = this.vertexOfFace(face, edge);
+
+			var _vertexOfFace2 = _slicedToArray(_vertexOfFace, 3);
+
+			var vertex0 = _vertexOfFace2[0];
+			var vertex1 = _vertexOfFace2[1];
+			var vertex2 = _vertexOfFace2[2];
+
+
+			return [point[vertex0], point[vertex1], point[vertex2]];
+		}
+
+		/**
    * Returns true if edge is a defined edge index, false otherwise
    * @param {int} edge - The edge index
    * @returns {boolean}
@@ -384,6 +471,30 @@ var Polygon2 = function () {
 			    v0 = 4 * edge + 2;
 
 			if (vertex === undefined || e[v0] !== vertex) return [e[v0], e[v0 + 1]];else return [e[v0 + 1], e[v0]];
+		}
+
+		/**
+   * Returns the from, to ordered points associated with edge
+   * Proxies {@link Polygon2#vertexOfEdge}
+   * @param {int} edge - The edge
+   * @param {int} [vertex] - The second vertex
+   * @returns {Vector2[]}
+   */
+
+	}, {
+		key: 'pointOfEdge',
+		value: function pointOfEdge(edge, vertex) {
+			var point = _point.get(this);
+
+			var _vertexOfEdge = this.vertexOfEdge(edge, vertex);
+
+			var _vertexOfEdge2 = _slicedToArray(_vertexOfEdge, 2);
+
+			var vertex0 = _vertexOfEdge2[0];
+			var vertex1 = _vertexOfEdge2[1];
+
+
+			return [point[vertex0], point[vertex1]];
 		}
 
 		/**
@@ -476,55 +587,6 @@ var Polygon2 = function () {
 		}
 
 		/**
-   * Returns the ccw ordered points associated with face
-   * Proxies {@link Polygon2#vertexOfFace}
-   * @param {int} face - The face index
-   * @param {Int} [edge] - The edge index of the first ccw vertex index
-   * @returns {Vector2[]}
-   */
-
-	}, {
-		key: 'pointOfFace',
-		value: function pointOfFace(face, edge) {
-			var point = _point.get(this);
-
-			var _vertexOfFace = this.vertexOfFace(face, edge);
-
-			var _vertexOfFace2 = _slicedToArray(_vertexOfFace, 3);
-
-			var vertex0 = _vertexOfFace2[0];
-			var vertex1 = _vertexOfFace2[1];
-			var vertex2 = _vertexOfFace2[2];
-
-
-			return [point[vertex0], point[vertex1], point[vertex2]];
-		}
-
-		/**
-   * Returns the from, to ordered points associated with edge
-   * Proxies {@link Polygon2#vertexOfEdge}
-   * @param {int} edge - The edge
-   * @param {int} [vertex] - The second vertex
-   * @returns {Vector2[]}
-   */
-
-	}, {
-		key: 'pointOfEdge',
-		value: function pointOfEdge(edge, vertex) {
-			var point = _point.get(this);
-
-			var _vertexOfEdge = this.vertexOfEdge(edge, vertex);
-
-			var _vertexOfEdge2 = _slicedToArray(_vertexOfEdge, 2);
-
-			var vertex0 = _vertexOfEdge2[0];
-			var vertex1 = _vertexOfEdge2[1];
-
-
-			return [point[vertex0], point[vertex1]];
-		}
-
-		/**
    * Returns the point associated with vertex
    * @param {int} vertex - The vertex
    * @returns {Vector2}
@@ -534,6 +596,18 @@ var Polygon2 = function () {
 		key: 'pointOfVertex',
 		value: function pointOfVertex(vertex) {
 			return _point.get(this)[vertex];
+		}
+
+		/**
+   * Returns the vertex index associated with point
+   * @param {Vector2} point - The point
+   * @returns {int}
+   */
+
+	}, {
+		key: 'vertexOfPoint',
+		value: function vertexOfPoint(point) {
+			return _point.get(this).indexOf(point);
 		}
 
 		/**
@@ -650,6 +724,42 @@ var Polygon2 = function () {
 		}
 
 		/**
+   * Removes all isolated vertices
+   * @returns {Polygon2}
+   */
+
+	}, {
+		key: 'clearIsolatedVertices',
+		value: function clearIsolatedVertices() {
+			var _iteratorNormalCompletion3 = true;
+			var _didIteratorError3 = false;
+			var _iteratorError3 = undefined;
+
+			try {
+				for (var _iterator3 = this.vertex[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+					var v = _step3.value;
+
+					if (this.faceOfVertex(v).length === 0) this.removeVertex(v);
+				}
+			} catch (err) {
+				_didIteratorError3 = true;
+				_iteratorError3 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion3 && _iterator3.return) {
+						_iterator3.return();
+					}
+				} finally {
+					if (_didIteratorError3) {
+						throw _iteratorError3;
+					}
+				}
+			}
+
+			return this;
+		}
+
+		/**
    * Returns the subdivision vertex index of the faces created by subdividing face
    * @param {int} face - The source face index
    * @param {Vector2} [point] - The subdivision point
@@ -693,7 +803,8 @@ var Polygon2 = function () {
 		key: 'splitEdge',
 		value: function splitEdge(edge, point) {
 			var e = _edge.get(this),
-			    f0 = edge * 4;
+			    f0 = edge * 4,
+			    f1 = f0 + 1;
 
 			if (point === undefined) {
 				var p = _point.get(this);
@@ -701,25 +812,39 @@ var Polygon2 = function () {
 				point = _Vector2.default.Add(p[e[f0 + 2]], p[e[f0 + 3]]).multiplyScalarEQ(0.5);
 			}
 
-			var vertex = this.createVertex(point);
+			var v3 = this.createVertex(point);
 
 			if (e[f0] !== -1) {
-				var vertexN = this.vertexOfFace(e[f0], edge);
+				var _vertexOfFace3 = this.vertexOfFace(e[f0], edge);
+
+				var _vertexOfFace4 = _slicedToArray(_vertexOfFace3, 3);
+
+				var v0 = _vertexOfFace4[0];
+				var v1 = _vertexOfFace4[1];
+				var v2 = _vertexOfFace4[2];
+
 
 				this.removeFace(e[f0]);
-				this.createFace(vertexN[0], vertex, vertexN[2]);
-				this.createFace(vertex, vertexN[1], vertexN[2]);
+				this.createFace(v0, v3, v2);
+				this.createFace(v3, v1, v2);
 			}
 
-			if (e[f0 + 1] !== -1) {
-				var _vertexN = this.vertexOfFace(e[f0], edge);
+			if (e[f1] !== -1) {
+				var _vertexOfFace5 = this.vertexOfFace(e[f1], edge);
 
-				this.removeFace(e[f0]);
-				this.createFace(_vertexN[0], vertex, _vertexN[2]);
-				this.createFace(vertex, _vertexN[1], _vertexN[2]);
+				var _vertexOfFace6 = _slicedToArray(_vertexOfFace5, 3);
+
+				var _v = _vertexOfFace6[0];
+				var _v2 = _vertexOfFace6[1];
+				var _v3 = _vertexOfFace6[2];
+
+
+				this.removeFace(e[f1]);
+				this.createFace(_v, v3, _v3);
+				this.createFace(v3, _v2, _v3);
 			}
 
-			return vertex;
+			return v3;
 		}
 
 		/**
@@ -735,21 +860,21 @@ var Polygon2 = function () {
 			    f0 = edge * 4,
 			    f1 = f0 + 1;
 
-			var _vertexOfFace3 = this.vertexOfFace(e[f0], edge);
+			var _vertexOfFace7 = this.vertexOfFace(e[f0], edge);
 
-			var _vertexOfFace4 = _slicedToArray(_vertexOfFace3, 3);
+			var _vertexOfFace8 = _slicedToArray(_vertexOfFace7, 3);
 
-			var f0v0 = _vertexOfFace4[0];
-			var f0v1 = _vertexOfFace4[1];
-			var f0v2 = _vertexOfFace4[2];
+			var f0v0 = _vertexOfFace8[0];
+			var f0v1 = _vertexOfFace8[1];
+			var f0v2 = _vertexOfFace8[2];
 
-			var _vertexOfFace5 = this.vertexOfFace(e[f1], edge);
+			var _vertexOfFace9 = this.vertexOfFace(e[f1], edge);
 
-			var _vertexOfFace6 = _slicedToArray(_vertexOfFace5, 3);
+			var _vertexOfFace10 = _slicedToArray(_vertexOfFace9, 3);
 
-			var f1v0 = _vertexOfFace6[0];
-			var f1v1 = _vertexOfFace6[1];
-			var f1v2 = _vertexOfFace6[2];
+			var f1v0 = _vertexOfFace10[0];
+			var f1v1 = _vertexOfFace10[1];
+			var f1v2 = _vertexOfFace10[2];
 
 
 			this.removeFace(e[f0]);
