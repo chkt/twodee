@@ -49,7 +49,11 @@ export default class Rectangle2 {
 		let minx =  Number.MAX_VALUE, miny = minx;
 		let maxx = -Number.MAX_VALUE, maxy = maxx;
 
-		for (var i = 0, p = point[0]; p; p = point[++i]) {
+		for (let i = point.length - 1; i > -1; i -= 1) {
+			if (!(i in point)) continue;
+
+			const p = point[i];
+
 			minx = Math.min(p.n[0], minx);
 			miny = Math.min(p.n[1], miny);
 			maxx = Math.max(p.n[0], maxx);
@@ -64,8 +68,7 @@ export default class Rectangle2 {
 		const transform = new Matrix3([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, midx, midy, 1.0]);
 		const extend = new Vector2([w, h]);
 
-		if (target === undefined) return new Rectangle2(transform, extend);
-		else return target.define(transform, extend);
+		return this.Define(transform, extend, target);
 	}
 
 	/**
