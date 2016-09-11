@@ -16,6 +16,11 @@ const _vertexEdgeDirty = new WeakMap();
 const _point = new WeakMap();
 
 
+/**
+ * Returns a free face index
+ * @private
+ * @returns {int}
+ */
 function _getFreeFace() {
 	const ff = _faceFree.get(this);
 	let index = ff.shift();
@@ -30,6 +35,11 @@ function _getFreeFace() {
 	return index;
 }
 
+/**
+ * Returns a free edge index
+ * @private
+ * @returns {int}
+ */
 function _getFreeEdge() {
 	const ef = _edgeFree.get(this);
 	let index = ef.shift();
@@ -44,6 +54,11 @@ function _getFreeEdge() {
 	return index;
 }
 
+/**
+ * Returns a free vertex index
+ * @private
+ * @returns {int}
+ */
 function _getFreeVertex() {
 	const vf = _vertexFree.get(this);
 	let index = vf.shift();
@@ -59,11 +74,19 @@ function _getFreeVertex() {
 }
 
 
+/**
+ * Returns the index of the edge created from vertex0 and vertex1
+ * @private
+ * @param {int} vertex0 - The first vertex index
+ * @param {int} vertex1 - the second vertex index
+ * @returns {int}
+ */
 function _createEdge(vertex0, vertex1) {
 	const e = _edge.get(this);
 	const index = _getFreeEdge.call(this);
 
 	const v0 = index * 4 + 2;
+
 	e[v0] = vertex0, e[v0 + 1] = vertex1;
 
 	_addVertexEdge.call(this, vertex0, index);
@@ -72,6 +95,11 @@ function _createEdge(vertex0, vertex1) {
 	return index;
 }
 
+/**
+ * Removes the edge
+ * @private
+ * @param {int} edge - The edge index
+ */
 function _removeEdge(edge) {
 	const e = _edge.get(this), f0 = edge * 4;
 	const v0 = f0 + 2, v1 = f0 + 3;
@@ -85,6 +113,12 @@ function _removeEdge(edge) {
 }
 
 
+/**
+ * Adds a vertex-edge relation to vertex
+ * @private
+ * @param {int} vertex - The vertex index
+ * @param {int} edge - The edge index
+ */
 function _addVertexEdge(vertex, edge) {
 	const v = _vertex.get(this), vE = _vertexEdge.get(this);
 	let dirty = _vertexEdgeDirty.get(this);
@@ -99,6 +133,12 @@ function _addVertexEdge(vertex, edge) {
 	if (dirty / tot > 0.33) _updateVertexEdge.call(this);
 }
 
+/**
+ * Removes a vertex-edge relation from vertex
+ * @private
+ * @param {int} vertex - The vertex index
+ * @param {int} edge - The edge index
+ */
 function _removeVertexEdge(vertex, edge) {
 	const v = _vertex.get(this), vE = _vertexEdge.get(this);
 	let dirty = _vertexEdgeDirty.get(this);
@@ -116,6 +156,10 @@ function _removeVertexEdge(vertex, edge) {
 	if (dirty / tot > 0.33) _updateVertexEdge.call(this);
 }
 
+/**
+ * Updates all vertex-edge indices
+ * @private
+ */
 function _updateVertexEdge() {
 	const v = _vertex.get(this), vE = [], source = _vertexEdge.get(this);
 
