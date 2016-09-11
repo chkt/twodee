@@ -16,7 +16,6 @@ const _vertexEdgeDirty = new WeakMap();
 const _point = new WeakMap();
 
 
-
 function _getFreeFace() {
 	const ff = _faceFree.get(this);
 	let index = ff.shift();
@@ -644,7 +643,7 @@ export default class Polygon2 {
 	 * @returns {int}
 	 */
 	splitEdge(edge, point) {
-		const e = _edge.get(this), f0 = edge * 4;
+		const e = _edge.get(this), f0 = edge * 4, f1 = f0 + 1;
 
 		if (point === undefined) {
 			var p = _point.get(this);
@@ -652,25 +651,25 @@ export default class Polygon2 {
 			point = Vector2.Add(p[e[f0 + 2]], p[e[f0 + 3]]).multiplyScalarEQ(0.5);
 		}
 
-		const vertex = this.createVertex(point);
+		const v3 = this.createVertex(point);
 
 		if (e[f0] !== -1) {
-			const vertexN = this.vertexOfFace(e[f0], edge);
+			const [v0, v1, v2] = this.vertexOfFace(e[f0], edge);
 
 			this.removeFace(e[f0]);
-			this.createFace(vertexN[0], vertex, vertexN[2]);
-			this.createFace(vertex, vertexN[1], vertexN[2]);
+			this.createFace(v0, v3, v2);
+			this.createFace(v3, v1, v2);
 		}
 
-		if (e[f0 + 1] !== -1) {
-			const vertexN = this.vertexOfFace(e[f0], edge);
+		if (e[f1] !== -1) {
+			const [v0, v1, v2] = this.vertexOfFace(e[f1], edge);
 
-			this.removeFace(e[f0]);
-			this.createFace(vertexN[0], vertex, vertexN[2]);
-			this.createFace(vertex, vertexN[1], vertexN[2]);
+			this.removeFace(e[f1]);
+			this.createFace(v0, v3, v2);
+			this.createFace(v3, v1, v2);
 		}
 
-		return vertex;
+		return v3;
 	}
 
 	/**
