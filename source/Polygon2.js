@@ -190,7 +190,7 @@ export default class Polygon2 {
 	 */
 	static Points(points) {
 		const aabb = Rectangle2.AABB(points);
-		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
+		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm * 2.0, 0.0, 1.0);
 
 		const mesh = new TriangleSubdivisionTree(bound);
 
@@ -208,7 +208,7 @@ export default class Polygon2 {
 	 */
 	static PolyLine2(outline) {
 		const aabb = Rectangle2.AABB(outline.point);
-		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
+		const bound = Triangle2.Equilateral(aabb.center, aabb.extend.norm * 2.0, 0.0, 1.0);
 
 		const mesh = new TriangleSubdivisionTree(bound);
 
@@ -706,7 +706,7 @@ export default class Polygon2 {
 	 * @returns {int}
 	 */
 	splitEdge(edge, point) {
-		const e = _edge.get(this), f0 = edge * 4, f1 = f0 + 1;
+		const e = _edge.get(this), f0 = edge * 4, f1 = f0 + 1, ef1 = e[f1];
 
 		if (point === undefined) {
 			var p = _point.get(this);
@@ -724,7 +724,7 @@ export default class Polygon2 {
 			this.createFace(v3, v1, v2);
 		}
 
-		if (e[f1] !== -1) {
+		if (ef1 !== -1) {
 			const [v0, v1, v2] = this.vertexOfFace(e[f1], edge);
 
 			this.removeFace(e[f1]);
