@@ -25,6 +25,9 @@ import Triangle2 from 'twodee/source/Triangle2';
 
 To get es5 safe versions of all files replace /source with /es5
 
+
+###Creating a triangle
+
 ```js
 const triangleA = new Triangle2(
 	new Vector2([0.0, 0.0]),
@@ -74,8 +77,29 @@ const collision = Triangle2.intersect(
 ```
 
 
+###Creating a ray
 
-###Creating a Bounding Box
+```js
+import Ray2 from 'twodee/source/Ray2';
+
+const ray = new Ray2(new Vector2([0.0, 0.0]), new Vector2([0.0, 1.0]));
+
+const origin = ray.origin;
+const orientation = ray.orientation;
+```
+
+Rays can test for intersections with line segments and other rays.
+All line intersection tests guarantee valid results for parallel and co-linear entities.
+
+```js
+const point0 = new Vector2([4.0, -0.5]);
+const point1 = new Vector2([4.0, 0.5]);
+const intersection = new Vector2();
+const collision = ray.intersectsSegment(point0, point1, intersection);
+```
+
+
+###Creating a Bounding Box Rectangle
 ```js
 import Vector2 from 'xyzw/source/Vector2';
 import Rectangle2 from 'twodee/source/Rectangle2';
@@ -87,6 +111,8 @@ const box = Rectangle2.AABB([
 	new Vector2([1.0, 0.0])
 ]);
 
+const transform = box.transform;
+const extend = box.extend;
 const center = box.center;
 const width = box.width;
 const height = box.height;
@@ -98,7 +124,8 @@ Rectangles can test for collisions with points, segments and other rectangles
 
 
 
-###Creating a Poly Line
+###Creating a segmented line
+
 ```js
 import PolyLine2 from 'twodee/source/PolyLine2';
 
@@ -110,7 +137,8 @@ const segments = lineA.segments;
 const closed = lineA.closed;
 ```
 
-Poly lines can test for collisions with other poly lines
+Segmented lines can test for collisions with points, line segments and other segment lines.
+All line intersection test guarantee valid results for parallel and co-linear entities.
 
 ```js
 const lineB = PolyLine2.ConvexHullGraham([
@@ -123,7 +151,6 @@ const lineB = PolyLine2.ConvexHullGraham([
 const intersections = [];
 const collision = lineB.intersects(lineA, intersections);
 ```
-
 
 
 ###Creating a Polygon
@@ -141,12 +168,15 @@ const v3 = poly.createVertex(new Vector2([1.0, 1.0]));
 const f0 = poly.createFace(v0, v1, v2);
 const f1 = poly.createFace(v1, v3, v2);
 
+const center = poly.centroid;
+const area = poly.area;
+
 const vertices = poly.vertex;
 const edges = poly.edge;
 const faces = poly.face;
+const point = poly.point;
+const drawList = poly.indexList;
 ```
-
-###Manipulating a Polygon
 
 Polygons expose a rich api for geometry manipulations:
 
@@ -156,4 +186,13 @@ const e1 = poly.turnEdge(e0);
 
 const [f2, f3] = poly.faceOfEdge(e1);
 const [f4, f5, f6] = poly.subdivideFace(f3);
+```
+
+Polygons can test for collisions with Points and other Polygons
+
+```js
+const polyB = Polygon2.PolyLine2(lineB);
+
+const intersections = [];
+const collision = poly.intersects(polyB);
 ```
