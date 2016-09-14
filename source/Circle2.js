@@ -9,7 +9,10 @@ export default class Circle2 {
 	 * @returns {Circle}
 	 */
 	static Define(p, r, target) {
-		return target === undefined ? new Circle2(p, r) : target.constructor.call(target, p, r);
+		if (target === undefined) target = new Circle2(p, r);
+		else this.constructor.call(target, p, r);
+
+		return target;
 	}
 
 	/**
