@@ -99,7 +99,11 @@ var Rectangle2 = function () {
 			var maxx = -Number.MAX_VALUE,
 			    maxy = maxx;
 
-			for (var i = 0, p = point[0]; p; p = point[++i]) {
+			for (var i = point.length - 1; i > -1; i -= 1) {
+				if (!(i in point)) continue;
+
+				var p = point[i];
+
 				minx = _Math2.default.min(p.n[0], minx);
 				miny = _Math2.default.min(p.n[1], miny);
 				maxx = _Math2.default.max(p.n[0], maxx);
@@ -114,7 +118,7 @@ var Rectangle2 = function () {
 			var transform = new _Matrix2.default([1.0, 0.0, 0.0, 0.0, 1.0, 0.0, midx, midy, 1.0]);
 			var extend = new _Vector2.default([w, h]);
 
-			if (target === undefined) return new Rectangle2(transform, extend);else return target.define(transform, extend);
+			return this.Define(transform, extend, target);
 		}
 
 		/**

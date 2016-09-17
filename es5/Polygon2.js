@@ -216,8 +216,44 @@ function _updateVertexEdge() {
 
 var Polygon2 = function () {
 	_createClass(Polygon2, null, [{
-		key: 'Points',
+		key: 'Define',
 
+
+		/**
+   * Returns a defined instance
+   * @constructor
+   * @param {Polygon2} [target] - The target instance
+   * @returns {Polygon2}
+   */
+		value: function Define(target) {
+			if (target === undefined) target = new this();else this.call(target);
+
+			return target;
+		}
+
+		/**
+   * Returns an instance created from json
+   * @constructor
+   * @param {Object} json - The json representation of the instance
+   * @param {Polygon2} [target] - The target instance
+   * @returns {Polygon2}
+   */
+
+	}, {
+		key: 'JSON',
+		value: function JSON(json, target) {
+			var f = json.f;
+			var p = json.p;
+
+
+			target = this.Define(target);
+
+			for (var x = 0, l = p.length; x < l; x += 2) {
+				target.createVertex(new _Vector2.default(p.slice(x, x + 2)));
+			}for (var v0 = 0, _l = f.length; v0 < _l; v0 += 3) {
+				target.createFace(f[v0], f[v0 + 1], f[v0 + 2]);
+			}return target;
+		}
 
 		/**
    * Returns an instance from points
@@ -226,9 +262,12 @@ var Polygon2 = function () {
    * @param {Vector2[]} points - The points
    * @returns {Polygon2}
    */
+
+	}, {
+		key: 'Points',
 		value: function Points(points) {
 			var aabb = _Rectangle2.default.AABB(points);
-			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
+			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm * 2.0, 0.0, 1.0);
 
 			var mesh = new _TriangleSubdivisionTree2.default(bound);
 
@@ -249,11 +288,11 @@ var Polygon2 = function () {
 		key: 'PolyLine2',
 		value: function PolyLine2(outline) {
 			var aabb = _Rectangle2.default.AABB(outline.point);
-			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm, 0.0, 2.0);
+			var bound = _Triangle2.default.Equilateral(aabb.center, aabb.extend.norm * 2.0, 0.0, 1.0);
 
 			var mesh = new _TriangleSubdivisionTree2.default(bound);
 
-			mesh.addOutline(outline);
+			mesh.intersectOutline(outline);
 
 			return mesh.poly;
 		}
@@ -284,28 +323,8 @@ var Polygon2 = function () {
 			var p = _point.get(poly);
 			var q = [];
 
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-
-			try {
-				for (var _iterator = p[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var point = _step.value;
-					q.push(_Vector2.default.Copy(point));
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
+			for (var i = p.length - 1; i > -1; i -= 1) {
+				if (i in p) q[i] = _Vector2.default.Copy(p[i]);
 			}
 
 			_point.set(target, q);
@@ -555,13 +574,13 @@ var Polygon2 = function () {
 			var e = _edge.get(this),
 			    res = Array(constraint.length).fill(-1);
 
-			var _iteratorNormalCompletion2 = true;
-			var _didIteratorError2 = false;
-			var _iteratorError2 = undefined;
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
 
 			try {
-				for (var _iterator2 = eN[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-					var edge = _step2.value;
+				for (var _iterator = eN[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var edge = _step.value;
 
 					var v0 = edge * 4 + 2;
 					var index = constraint.indexOf(e[v0] !== vertex ? e[v0] : e[v0 + 1]);
@@ -569,16 +588,16 @@ var Polygon2 = function () {
 					if (index !== -1) res[index] = edge;
 				}
 			} catch (err) {
-				_didIteratorError2 = true;
-				_iteratorError2 = err;
+				_didIteratorError = true;
+				_iteratorError = err;
 			} finally {
 				try {
-					if (!_iteratorNormalCompletion2 && _iterator2.return) {
-						_iterator2.return();
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
 					}
 				} finally {
-					if (_didIteratorError2) {
-						throw _iteratorError2;
+					if (_didIteratorError) {
+						throw _iteratorError;
 					}
 				}
 			}
@@ -596,6 +615,57 @@ var Polygon2 = function () {
 		key: 'pointOfVertex',
 		value: function pointOfVertex(vertex) {
 			return _point.get(this)[vertex];
+		}
+
+		/**
+   * Returns true if point is a defined point, false otherwise
+   * @param {Vector2} point - The point
+   * @returns {boolean}
+   */
+
+	}, {
+		key: 'hasPoint',
+		value: function hasPoint(point) {
+			return _point.get(this).indexOf(point) !== 0;
+		}
+
+		/**
+   * Returns the point at coordinates of point if found, null otherwise
+   * @param {Vector2} point - The point
+   * @returns {Vector2|null}
+   */
+
+	}, {
+		key: 'pointAt',
+		value: function pointAt(point) {
+			var points = _point.get(this);
+
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
+
+			try {
+				for (var _iterator2 = points[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var p = _step2.value;
+
+					if (_Vector2.default.isEQ(p, point)) return p;
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2.return) {
+						_iterator2.return();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
+
+			return null;
 		}
 
 		/**
@@ -720,7 +790,8 @@ var Polygon2 = function () {
 			v[e0] = v[e0 + 1] = -1;
 
 			_vertexFree.get(this).push(vertex);
-			_point.get(this)[vertex] = null;
+
+			delete _point.get(this)[vertex];
 		}
 
 		/**
@@ -804,7 +875,8 @@ var Polygon2 = function () {
 		value: function splitEdge(edge, point) {
 			var e = _edge.get(this),
 			    f0 = edge * 4,
-			    f1 = f0 + 1;
+			    f1 = f0 + 1,
+			    ef1 = e[f1];
 
 			if (point === undefined) {
 				var p = _point.get(this);
@@ -829,7 +901,7 @@ var Polygon2 = function () {
 				this.createFace(v3, v1, v2);
 			}
 
-			if (e[f1] !== -1) {
+			if (ef1 !== -1) {
 				var _vertexOfFace5 = this.vertexOfFace(e[f1], edge);
 
 				var _vertexOfFace6 = _slicedToArray(_vertexOfFace5, 3);
@@ -901,15 +973,16 @@ var Polygon2 = function () {
 
 			var uv = fuv !== undefined ? [] : undefined;
 
-			for (var i = f.length - 1; i > -1; i -= 1) {
-				var v0 = i * 6 + 3;
+			for (var v0 = f.length - 3; v0 > -1; v0 -= 6) {
+				if (f[v0] === -1) continue;
+
 				var p0 = point[f[v0]],
 				    p1 = point[f[v0 + 1]],
 				    p2 = point[f[v0 + 2]];
 
 				if (!_Triangle2.default.intersectPoint(p0, p1, p2, q, uv)) continue;
 
-				if (fuv !== undefined) fuv.splice.apply(fuv, [0, fuv.length, i].concat(_toConsumableArray(uv)));
+				if (fuv !== undefined) fuv.splice.apply(fuv, [0, fuv.length, (v0 - 3) / 6].concat(_toConsumableArray(uv)));
 
 				return true;
 			}
@@ -932,11 +1005,15 @@ var Polygon2 = function () {
 			    pB = _point.get(poly);
 
 			for (var vA0 = fA.length - 3; vA0 > -1; vA0 -= 6) {
+				if (fA[vA0] === -1) continue;
+
 				var pA0 = pA[fA[vA0]],
 				    pA1 = pA[fA[vA0 + 1]],
 				    pA2 = pA[fA[vA0 + 2]];
 
 				for (var vB0 = fB.length - 3; vB0 > -1; vB0 -= 6) {
+					if (fB[vB0] === -1) continue;
+
 					var pB0 = pB[fB[vB0]],
 					    pB1 = pB[fB[vB0 + 1]],
 					    pB2 = pB[fB[vB0 + 2]];
@@ -987,12 +1064,47 @@ var Polygon2 = function () {
 			var point = _point.get(this);
 
 			for (var i = point.length - 1; i > -1; i -= 1) {
+				if (!(i in point)) continue;
+
 				var p = point[i];
 
 				_Vector2.default.Multiply2x3Matrix3(transform, p, p);
 			}
 
 			return this;
+		}
+
+		/**
+   * Returns a json reprentation of the instance
+   * @returns {{f: int[], p: float[]}}
+   */
+
+	}, {
+		key: 'toJSON',
+		value: function toJSON() {
+			var face = _face.get(this);
+			var point = _point.get(this);
+			var map = {},
+			    p = [],
+			    f = [];
+
+			for (var v0 = 3, l = face.length; v0 < l; v0 += 6) {
+				for (var i = 0; i < 3; i += 1) {
+					var vertex = face[v0 + i];
+
+					if (!(vertex in map)) {
+						map[vertex] = p.length * 0.5;
+						p.push.apply(p, _toConsumableArray(point[vertex].n));
+					}
+
+					f.push(map[vertex]);
+				}
+			}
+
+			return {
+				f: f,
+				p: p
+			};
 		}
 	}, {
 		key: 'face',
@@ -1066,8 +1178,10 @@ var Polygon2 = function () {
 			    res = [];
 
 			for (var v0 = 3, l = face.length; v0 < l; v0 += 6) {
-				res.push(face[v0], face[v0 + 1], face[v0 + 2]);
-			}return res;
+				if (face[v0] !== -1) res.push(face[v0], face[v0 + 1], face[v0 + 2]);
+			}
+
+			return res;
 		}
 
 		/**

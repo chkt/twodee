@@ -22,7 +22,9 @@ var Circle2 = function () {
    * @returns {Circle}
    */
 		value: function Define(p, r, target) {
-			return target === undefined ? new Circle2(p, r) : target.constructor.call(target, p, r);
+			if (target === undefined) target = new this(p, r);else this.call(target, p, r);
+
+			return target;
 		}
 
 		/**
