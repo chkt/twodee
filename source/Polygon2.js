@@ -182,6 +182,39 @@ function _updateVertexEdge() {
 export default class Polygon2 {
 
 	/**
+	 * Returns a defined instance
+	 * @constructor
+	 * @param {Polygon2} [target] - The target instance
+	 * @returns {Polygon2}
+	 */
+	static Define(target) {
+		if (target === undefined) target = new this();
+		else this.call(target);
+
+		return target;
+	}
+
+	/**
+	 * Returns an instance created from json
+	 * @constructor
+	 * @param {Object} json - The json representation of the instance
+	 * @param {Polygon2} [target] - The target instance
+	 * @returns {Polygon2}
+	 */
+	static JSON(json, target) {
+		const { f, p } = json;
+
+		target = this.Define(target);
+
+		for (let x = 0, l = p.length; x < l; x += 2) target.createVertex(new Vector2(p.slice(x, x + 2)));
+
+		for (let v0 = 0, l = f.length; v0 < l; v0 += 3) target.createFace(f[v0], f[v0 + 1], f[v0 + 2]);
+
+		return target;
+	}
+
+
+	/**
 	 * Returns an instance from points
 	 * Using TriangleSubdivisionTree
 	 * @constructor
@@ -562,6 +595,30 @@ export default class Polygon2 {
 
 
 	/**
+	 * Returns true if point is a defined point, false otherwise
+	 * @param {Vector2} point - The point
+	 * @returns {boolean}
+	 */
+	hasPoint(point) {
+		return _point.get(this).indexOf(point) !== 0;
+	}
+
+	/**
+	 * Returns the point at coordinates of point if found, null otherwise
+	 * @param {Vector2} point - The point
+	 * @returns {Vector2|null}
+	 */
+	pointAt(point) {
+		const points = _point.get(this);
+
+		for (let p of points) {
+			if (Vector2.isEQ(p, point)) return p;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the vertex index associated with point
 	 * @param {Vector2} point - The point
 	 * @returns {int}
@@ -846,5 +903,34 @@ export default class Polygon2 {
 		}
 
 		return this;
+	}
+
+
+	/**
+	 * Returns a json reprentation of the instance
+	 * @returns {{f: int[], p: float[]}}
+	 */
+	toJSON() {
+		const face = _face.get(this);
+		const point = _point.get(this);
+		const map = {}, p = [], f = [];
+
+		for (let v0 = 3, l = face.length; v0 < l; v0 += 6) {
+			for (let i = 0; i < 3; i += 1) {
+				const vertex = face[v0 + i];
+
+				if (!(vertex in map)) {
+					map[vertex] = p.length * 0.5;
+					p.push(...point[vertex].n);
+				}
+
+				f.push(map[vertex]);
+			}
+		}
+
+		return {
+			f,
+			p
+		};
 	}
 }
