@@ -384,16 +384,15 @@ export default class Polygon2 {
 	 */
 	get centroid() {
 		const face = _face.get(this), point = _point.get(this), THIRD = 1.0 / 3.0;
-		const tri = new Triangle2(), res = new Vector2();
+		const res = new Vector2();
 
 		let atot = 0;
 
 		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) {
-			tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+			const p0 = point[face[v0]], p1 = point[face[v0 + 1]], p2 = point[face[v0 + 2]];
+			const a = Triangle2.area(p0, p1, p2);
 
-			const a = tri.area;
-
-			res.addEQ(tri.centroid.multiplyScalarEQ(a));
+			res.addEQ(Triangle2.centroid(p0, p1, p2).multiplyScalarEQ(a));
 			atot += a;
 		}
 
@@ -406,15 +405,14 @@ export default class Polygon2 {
 	 */
 	get area() {
 		const face = _face.get(this), point = _point.get(this);
-		const tri = new Triangle2();
 
 		let res = 0.0;
 
-		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) {
-			tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
-
-			res += tri.area;
-		}
+		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) res += Triangle2.area(
+			point[face[v0]],
+			point[face[v0 + 1]],
+			point[face[v0 + 2]]
+		);
 
 		return res;
 	}
