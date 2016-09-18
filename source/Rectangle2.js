@@ -282,7 +282,7 @@ export default class Rectangle2 {
 	 * @type number
 	 */
 	get height() {
-		return this.extend[1] * 2.0;
+		return this.extend.n[1] * 2.0;
 	}
 
 	set height(n) {
