@@ -121,6 +121,20 @@ export default class Triangle2 {
 		return new Vector2([x, y]);
 	}
 
+	/**
+	 * Returns the area (1/2)|AB x AC| of triangle (p0,p1,p2)
+	 * @param {Vector2} p0 - The first point
+	 * @param {Vector2} p1 - The second point
+	 * @param {Vector2} p2 - The third point
+	 * @returns {number}
+	 */
+	static area(p0, p1, p2) {
+		const a = Vector2.Subtract(p1, p0);
+		const b = Vector2.Subtract(p2, p0);
+
+		return Math.abs(Vector2.cross(a, b)) * 0.5;
+	}
+
 
 	/**
 	 * Returns true if the circumcircle of ccw triangle (p0,p1,p2) intersects with point (q0), false otherwise
@@ -328,10 +342,7 @@ export default class Triangle2 {
 	 * @type number
 	 */
 	get area() {
-		const vA = Vector2.Subtract(this.p1, this.p0);
-		const vB = Vector2.Subtract(this.p2, this.p0);
-
-		return Math.abs(Vector2.cross(vA, vB)) * 0.5;
+		return Triangle2.area(this.p0, this.p1, this.p2);
 	}
 
 
