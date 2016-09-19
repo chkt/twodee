@@ -167,6 +167,23 @@ var Triangle2 = function () {
 		}
 
 		/**
+   * Returns the area (1/2)|AB x AC| of triangle (p0,p1,p2)
+   * @param {Vector2} p0 - The first point
+   * @param {Vector2} p1 - The second point
+   * @param {Vector2} p2 - The third point
+   * @returns {number}
+   */
+
+	}, {
+		key: 'area',
+		value: function area(p0, p1, p2) {
+			var a = _Vector2.default.Subtract(p1, p0);
+			var b = _Vector2.default.Subtract(p2, p0);
+
+			return _Math2.default.abs(_Vector2.default.cross(a, b)) * 0.5;
+		}
+
+		/**
    * Returns true if the circumcircle of ccw triangle (p0,p1,p2) intersects with point (q0), false otherwise
    * @param {Vector2} p0 - The first point of the triangle
    * @param {Vector2} p1 - The second point of the triangle
@@ -500,10 +517,7 @@ var Triangle2 = function () {
 	}, {
 		key: 'area',
 		get: function get() {
-			var vA = _Vector2.default.Subtract(this.p1, this.p0);
-			var vB = _Vector2.default.Subtract(this.p2, this.p0);
-
-			return _Math2.default.abs(_Vector2.default.cross(vA, vB)) * 0.5;
+			return Triangle2.area(this.p0, this.p1, this.p2);
 		}
 	}]);
 

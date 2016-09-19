@@ -1195,17 +1195,17 @@ var Polygon2 = function () {
 			var face = _face.get(this),
 			    point = _point.get(this),
 			    THIRD = 1.0 / 3.0;
-			var tri = new _Triangle2.default(),
-			    res = new _Vector2.default();
+			var res = new _Vector2.default();
 
 			var atot = 0;
 
 			for (var v0 = face.length - 3; v0 > -1; v0 -= 6) {
-				tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+				var p0 = point[face[v0]],
+				    p1 = point[face[v0 + 1]],
+				    p2 = point[face[v0 + 2]];
+				var a = _Triangle2.default.area(p0, p1, p2);
 
-				var a = tri.area;
-
-				res.addEQ(tri.centroid.multiplyScalarEQ(a));
+				res.addEQ(_Triangle2.default.centroid(p0, p1, p2).multiplyScalarEQ(a));
 				atot += a;
 			}
 
@@ -1222,17 +1222,12 @@ var Polygon2 = function () {
 		get: function get() {
 			var face = _face.get(this),
 			    point = _point.get(this);
-			var tri = new _Triangle2.default();
 
 			var res = 0.0;
 
 			for (var v0 = face.length - 3; v0 > -1; v0 -= 6) {
-				tri.define(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
-
-				res += tri.area;
-			}
-
-			return res;
+				res += _Triangle2.default.area(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
+			}return res;
 		}
 	}]);
 

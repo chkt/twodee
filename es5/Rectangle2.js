@@ -520,7 +520,7 @@ var Rectangle2 = function () {
 	}, {
 		key: 'height',
 		get: function get() {
-			return this.extend[1] * 2.0;
+			return this.extend.n[1] * 2.0;
 		},
 		set: function set(n) {
 			this.extend.n[1] = n * 0.5;
