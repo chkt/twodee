@@ -1,7 +1,7 @@
 {
 	"name" : "twodee",
 	"description" : "Two dimensional geometry manipulation",
-	"version" : "0.2.2",
+	"version" : "0.2.3",
 	"license" : "MIT",
 
 	"keywords" : [
@@ -44,7 +44,7 @@
 	},
 
 	"dependencies" : {
-		"xyzw" : "~0.9"
+		"xyzw" : "~0.9.5"
 	},
 
 	"devDependencies" : {
