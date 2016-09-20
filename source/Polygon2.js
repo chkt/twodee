@@ -389,6 +389,8 @@ export default class Polygon2 {
 		let atot = 0;
 
 		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) {
+			if (face[v0] === -1) continue;
+
 			const p0 = point[face[v0]], p1 = point[face[v0 + 1]], p2 = point[face[v0 + 2]];
 			const a = Triangle2.area(p0, p1, p2);
 
@@ -408,11 +410,15 @@ export default class Polygon2 {
 
 		let res = 0.0;
 
-		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) res += Triangle2.area(
-			point[face[v0]],
-			point[face[v0 + 1]],
-			point[face[v0 + 2]]
-		);
+		for (let v0 = face.length - 3; v0 > -1; v0 -= 6) {
+			if (face[v0] === -1) continue;
+
+			res += Triangle2.area(
+				point[face[v0]],
+				point[face[v0 + 1]],
+				point[face[v0 + 2]]
+			);
+		}
 
 		return res;
 	}
