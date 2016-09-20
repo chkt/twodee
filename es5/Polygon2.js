@@ -1200,6 +1200,8 @@ var Polygon2 = function () {
 			var atot = 0;
 
 			for (var v0 = face.length - 3; v0 > -1; v0 -= 6) {
+				if (face[v0] === -1) continue;
+
 				var p0 = point[face[v0]],
 				    p1 = point[face[v0 + 1]],
 				    p2 = point[face[v0 + 2]];
@@ -1226,8 +1228,12 @@ var Polygon2 = function () {
 			var res = 0.0;
 
 			for (var v0 = face.length - 3; v0 > -1; v0 -= 6) {
+				if (face[v0] === -1) continue;
+
 				res += _Triangle2.default.area(point[face[v0]], point[face[v0 + 1]], point[face[v0 + 2]]);
-			}return res;
+			}
+
+			return res;
 		}
 	}]);
 
