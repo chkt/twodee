@@ -99,6 +99,27 @@ describe('Polygon2', () => {
 
 			assert(Math.abs(poly.area - a8(Vector2.Subtract(poly.pointOfVertex(2), poly.pointOfVertex(1)).norm)) < 1.0e-10);
 		});
+
+		it("should return the right area for polygons with removed faces", () => {
+			function a6(len) {
+				return 3 * Math.sqrt(3) / 2 * len * len * 5.0 / 6.0;
+			}
+
+			function a8(len) {
+				return 2 * (1 + Math.sqrt(2)) * len * len * 7.0 / 8.0;
+			}
+
+			let poly = _createPolygon(6, 33.0);
+
+			poly.removeFace(0);
+
+			assert(Math.abs(poly.area - a6(33.0)) < 1.0e-10);
+
+			poly = _createPolygon(8, 33.0);
+			poly.removeFace(0);
+
+			assert(Math.abs(poly.area - a8(Vector2.Subtract(poly.pointOfVertex(2), poly.pointOfVertex(3)).norm)) < 1.0e-10);
+		});
 	});
 
 	describe('#createFace', () => {
