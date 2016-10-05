@@ -2,6 +2,9 @@ import Vector2 from 'xyzw/es5/Vector2';
 
 
 
+/**
+ * Circle geometry
+ */
 export default class Circle2 {
 
 	/**
