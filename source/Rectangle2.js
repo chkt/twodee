@@ -13,7 +13,6 @@ export default class Rectangle2 {
 
 	/**
 	 * Defines an instance
-	 * @constructor
 	 * @param {Matrix3} transform - The transform
 	 * @param {Vector2} extend - The extend
 	 * @param {Rectangle2} [target] - The target instance
@@ -26,7 +25,6 @@ export default class Rectangle2 {
 
 	/**
 	 * Returns a new instance from w, h
-	 * @constructor
 	 * @param {number} w - The width
 	 * @param {number} h - The height
 	 * @param {Rectangle2} [target] - The target instance
@@ -40,7 +38,6 @@ export default class Rectangle2 {
 
 	/**
 	 * Returns a new instance from point
-	 * @constructor
 	 * @param {Vector2[]} point - The points
 	 * @param {Rectangle2} [target] - The target instance
 	 * @returns {Rectangle2}
@@ -73,7 +70,6 @@ export default class Rectangle2 {
 
 	/**
 	 * Returns an instance representing the transformation of rectangle
-	 * @constructor
 	 * @param {Rectangle2} rectangle - The source
 	 * @param {Matrix3} transform - The transform
 	 * @param {Rectangle2} [target] - The target instance
@@ -87,7 +83,6 @@ export default class Rectangle2 {
 
 	/**
 	 * Returns a copy of rectangle
-	 * @constructor
 	 * @param {Rectangle2} rectangle - The source
 	 * @param {Rectangle2} [target] - The target instance
 	 * @returns {Rectangle2}
@@ -224,12 +219,12 @@ export default class Rectangle2 {
 	constructor(transform, extend) {
 		/**
 		 * The transform
-		 * @type Matrix3
+		 * @type {Matrix3}
 		 */
 		this.transform = transform || new Matrix3();
 		/**
 		 * The half-dimensions
-		 * @type Vector2
+		 * @type {Vector2}
 		 */
 		this.extend = extend || new Vector2();
 	}
@@ -250,7 +245,7 @@ export default class Rectangle2 {
 
 	/**
 	 * The dereferenced center point
-	 * @type Vector2
+	 * @type {Vector2}
 	 */
 	get center() {
 		return new Vector2([this.transform.n[6], this.transform.n[7]]);
@@ -265,7 +260,7 @@ export default class Rectangle2 {
 	/**
 	 * The width
 	 * Alias of {@link Rectangle2#extend}
-	 * @type number
+	 * @type {number}
 	 */
 	get width() {
 		return this.extend.n[0] * 2.0;
@@ -279,7 +274,7 @@ export default class Rectangle2 {
 	/**
 	 * The height
 	 * Alias of {@link Rectangle#extend}
-	 * @type number
+	 * @type {number}
 	 */
 	get height() {
 		return this.extend.n[1] * 2.0;
@@ -292,7 +287,7 @@ export default class Rectangle2 {
 
 	/**
 	 * The aspect (w/h)
-	 * @type number
+	 * @type {number}
 	 */
 	get aspect() {
 		return this.extend.n[0] / this.extend.n[1];
@@ -300,7 +295,7 @@ export default class Rectangle2 {
 
 	/**
 	 * The area (w*h)
-	 * @type number
+	 * @type {number}
 	 */
 	get area() {
 		return this.extend.n[0] * this.extend.n[1] * 4.0;
