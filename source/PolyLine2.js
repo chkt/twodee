@@ -48,7 +48,6 @@ export default class PolyLine2 {
 	/**
 	 * Returns a new instance from the convex hull of point
 	 * Using graham scanning
-	 * @constructor
 	 * @param {Vector2[]} point - The points
 	 * @param {PolyLine2} [target] - The target instance
 	 * @returns {PolyLine2}
@@ -90,7 +89,6 @@ export default class PolyLine2 {
 
 	/**
 	 * Returns a new instance from rectangle
-	 * @constructor
 	 * @param {Rectangle2} rectangle - The source
 	 * @param {PolyLine2} [target] - The target instance
 	 * @returns {PolyLine2}
@@ -131,7 +129,6 @@ export default class PolyLine2 {
 
 	/**
 	 * Returns a copy of poly
-	 * @constructor
 	 * @param {PolyLine2} poly - The source
 	 * @param {PolyLine2} [target] - The target instance
 	 * @returns {PolyLine2}
@@ -248,7 +245,7 @@ export default class PolyLine2 {
 	constructor(point) {
 		/**
 		 * The points
-		 * @type Vector2[]
+		 * @type {Vector2[]}
 		 */
 		this.point = point || [];
 	}
@@ -268,7 +265,7 @@ export default class PolyLine2 {
 
 	/**
 	 * The number of segments
-	 * @type int
+	 * @type {int}
 	 */
 	get segments() {
 		return this.point.length - 1;
@@ -276,7 +273,7 @@ export default class PolyLine2 {
 
 	/**
 	 * true if the first and last points are identical (===), false otherwise
-	 * @type boolean
+	 * @type {boolean}
 	 */
 	get closed() {
 		return this.point[0] === this.point[this.point.length - 1];
