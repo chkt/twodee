@@ -9,11 +9,10 @@ export default class Circle2 {
 
 	/**
 	 * Returns an instance representing p and r
-	 * @constructor
 	 * @param {Vector2} p - The center point
 	 * @param {number} r - The radius
 	 * @param {Circle2} [target] - The target instance
-	 * @returns {Circle}
+	 * @returns {Circle2}
 	 */
 	static Define(p, r, target) {
 		if (target === undefined) target = new this(p, r);
@@ -24,7 +23,6 @@ export default class Circle2 {
 
 	/**
 	 * Returns an instance at p with area a
-	 * @constructor
 	 * @param {Vector2} p - The center point
 	 * @param {number} a - The area
 	 * @param {Circle2} [target] - The target instance
@@ -39,7 +37,6 @@ export default class Circle2 {
 
 	/**
 	 * Returns a copy of circle
-	 * @constructor
 	 * @param {Circle2} circle - The source
 	 * @param {Circle2} [target] - The target instance
 	 * @returns {Circle2}
@@ -61,7 +58,7 @@ export default class Circle2 {
 	}
 
 	/**
-	 * returns true if circle (p,r) intersects circle (q,s), false otherwise
+	 * Returns true if circle (p0,r0) intersects circle (p1,r1), false otherwise
 	 * @param {Vector2} p0 - The first circle center
 	 * @param {number} r0 - The first circle radius
 	 * @param {Vector2} p1 - The second circle center
@@ -133,7 +130,7 @@ export default class Circle2 {
 	 * Redefines the instance
 	 * @param {Vector2} p - The center point
 	 * @param {Vector2} r - The radius
-	 * @returns {Circle}
+	 * @returns {Circle2}
 	 */
 	define(p, r) {
 		this.constructor.call(this, p, r);
@@ -144,7 +141,7 @@ export default class Circle2 {
 
 	/**
 	 * The area
-	 * @type number
+	 * @type {number}
 	 */
 	get area() {
 		return Math.PI * this.radius * this.radius;
