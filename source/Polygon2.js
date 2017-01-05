@@ -183,7 +183,6 @@ export default class Polygon2 {
 
 	/**
 	 * Returns a defined instance
-	 * @constructor
 	 * @param {Polygon2} [target] - The target instance
 	 * @returns {Polygon2}
 	 */
@@ -196,7 +195,6 @@ export default class Polygon2 {
 
 	/**
 	 * Returns an instance created from json
-	 * @constructor
 	 * @param {Object} json - The json representation of the instance
 	 * @param {Polygon2} [target] - The target instance
 	 * @returns {Polygon2}
@@ -217,7 +215,6 @@ export default class Polygon2 {
 	/**
 	 * Returns an instance from points
 	 * Using TriangleSubdivisionTree
-	 * @constructor
 	 * @param {Vector2[]} points - The points
 	 * @returns {Polygon2}
 	 */
@@ -235,7 +232,6 @@ export default class Polygon2 {
 	/**
 	 * Returns an instance from outline
 	 * Using TriangleSubdivisionTree
-	 * @constructor
 	 * @param {PolyLine2} outline - The outline
 	 * @returns {Polygon2}
 	 */
@@ -253,7 +249,6 @@ export default class Polygon2 {
 
 	/**
 	 * Returns a copy of poly
-	 * @constructor
 	 * @param {Polygon2} poly - The source
 	 * @param {Polygon2} [target] - The target instance
 	 * @returns {Polygon2}
@@ -314,7 +309,7 @@ export default class Polygon2 {
 
 	/**
 	 * The dereferenced defined face indices of the instance
-	 * @type int[]
+	 * @type {int[]}
 	 */
 	get face() {
 		const f = _face.get(this), res = [];
@@ -328,7 +323,7 @@ export default class Polygon2 {
 
 	/**
 	 * The dereferenced defined edge indices of the instance
-	 * @type int[]
+	 * @type {int[]}
 	 */
 	get edge() {
 		const e = _edge.get(this), res = [];
@@ -342,7 +337,7 @@ export default class Polygon2 {
 
 	/**
 	 * The dereferenced defined vertex indices of the instance
-	 * @type int[]
+	 * @type {int[]}
 	 */
 	get vertex() {
 		const v = _vertex.get(this), res = [];
@@ -356,7 +351,7 @@ export default class Polygon2 {
 
 	/**
 	 * The deferenced list of points of the instance
-	 * @type Vector2[]
+	 * @type {Vector2[]}
 	 */
 	get point() {
 		return _point.get(this).slice(0);
@@ -365,7 +360,7 @@ export default class Polygon2 {
 
 	/**
 	 * The dereferenced display list of vertex indices of the instance
-	 * @type number[]
+	 * @type {number[]}
 	 */
 	get indexList() {
 		const face = _face.get(this), res = [];
@@ -380,7 +375,7 @@ export default class Polygon2 {
 
 	/**
 	 * The dereferenced centroid point
-	 * @returns {Vector2}
+	 * @type {Vector2}
 	 */
 	get centroid() {
 		const face = _face.get(this), point = _point.get(this), THIRD = 1.0 / 3.0;
@@ -403,7 +398,7 @@ export default class Polygon2 {
 
 	/**
 	 * The area sum((1/2)|AB x AC|)
-	 * @returns {number}
+	 * @type {number}
 	 */
 	get area() {
 		const face = _face.get(this), point = _point.get(this);
@@ -473,7 +468,7 @@ export default class Polygon2 {
 	 * Returns the ccw ordered points associated with face
 	 * Proxies {@link Polygon2#vertexOfFace}
 	 * @param {int} face - The face index
-	 * @param {Int} [edge] - The edge index of the first ccw vertex index
+	 * @param {int} [edge] - The edge index of the first ccw vertex index
 	 * @returns {Vector2[]}
 	 */
 	pointOfFace(face, edge) {
