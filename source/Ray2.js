@@ -62,7 +62,6 @@ export default class Ray2 {
 
 	/**
 	 * Returns a defined instance
-	 * @constructor
 	 * @param {Vector2} origin - The ray origin
 	 * @param {Vector2} orientation - The ray orientation
 	 * @param {Ray2} [target] - The target instance
