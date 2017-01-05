@@ -34,7 +34,6 @@ export default class Triangle2 {
 
 	/**
 	 * Returns an instance representing the equilateral triangle circumscribed|inscribed by r, rotated by rad
-	 * @constructor
 	 * @param {Vector2} p - The centroid point
 	 * @param {number} r - The distance between centroid and point
 	 * @param {number} [rad=0.0] - The angle
@@ -61,7 +60,6 @@ export default class Triangle2 {
 
 	/**
 	 * Returns an instance representing the transformation of triangle
-	 * @constructor
 	 * @param {Triangle2} triangle - The source
 	 * @param {Matrix3} transform - The transform
 	 * @param {Triangle2} [target] - The target instance
@@ -279,17 +277,17 @@ export default class Triangle2 {
 	constructor(p0, p1, p2) {
 		/**
 		 * The first point
-		 * @type Vector2
+		 * @type {Vector2}
 		 */
 		this.p0 = p0 || new Vector2();
 		/**
 		 * The second point
-		 * @type Vector2
+		 * @type {Vector2}
 		 */
 		this.p1 = p1 || new Vector2();
 		/**
 		 * The third point
-		 * @type Vector2
+		 * @type {Vector2}
 		 */
 		this.p2 = p2 || new Vector2();
 	}
@@ -311,7 +309,7 @@ export default class Triangle2 {
 
 	/**
 	 * CW (1) if the instance is cw rotated, CCW (-1) if the instance is ccw rotated, DEGENERATE (0) if the instance is degenerate
-	 * @type int
+	 * @type {int}
 	 */
 	get orientation() {
 		const vE0 = Vector2.Subtract(this.p1, this.p0);
@@ -323,7 +321,7 @@ export default class Triangle2 {
 
 	/**
 	 * The dereferenced centroid point
-	 * @type Vector2
+	 * @type {Vector2}
 	 */
 	get centroid() {
 		return Vector2.BarycentricUV(this.p0, this.p1, this.p2, MATH_THIRD, MATH_THIRD);
@@ -331,7 +329,7 @@ export default class Triangle2 {
 
 	/**
 	 * The dereferenced center of the enclosing circle
-	 * @type Vector2
+	 * @type {Vector2}
 	 */
 	get circumcenter() {
 		return Triangle2.circumcenter(this.p0, this.p1, this.p2);
@@ -339,7 +337,7 @@ export default class Triangle2 {
 
 	/**
 	 * The area (1/2)|AB x AC|
-	 * @type number
+	 * @type {number}
 	 */
 	get area() {
 		return Triangle2.area(this.p0, this.p1, this.p2);
@@ -424,6 +422,7 @@ export default class Triangle2 {
 
 	/**
 	 * Returns a string representation of the instance
+	 * @param {int} [digits=3] - The decimal places
 	 * @returns {string}
 	 */
 	toString(digits) {
