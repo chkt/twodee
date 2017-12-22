@@ -150,11 +150,10 @@ function _treeSubdivide(faces, subfaces) {
 
 	if (faces.length === 0) return;
 
-	var _subfaces = _slicedToArray(subfaces, 3);
-
-	var f0 = _subfaces[0];
-	var f1 = _subfaces[1];
-	var f2 = _subfaces[2];
+	var _subfaces = _slicedToArray(subfaces, 3),
+	    f0 = _subfaces[0],
+	    f1 = _subfaces[1],
+	    f2 = _subfaces[2];
 
 	var o0 = tree.length,
 	    o1 = o0 + SIZE,
@@ -206,14 +205,11 @@ function _faceSubdivide(face, q) {
 
 	var v3 = poly.subdivideFace(face, q);
 
-	var _poly$faceOfVertex = poly.faceOfVertex(v3);
-
-	var _poly$faceOfVertex2 = _slicedToArray(_poly$faceOfVertex, 3);
-
-	var f0 = _poly$faceOfVertex2[0];
-	var f1 = _poly$faceOfVertex2[1];
-	var f2 = _poly$faceOfVertex2[2];
-
+	var _poly$faceOfVertex = poly.faceOfVertex(v3),
+	    _poly$faceOfVertex2 = _slicedToArray(_poly$faceOfVertex, 3),
+	    f0 = _poly$faceOfVertex2[0],
+	    f1 = _poly$faceOfVertex2[1],
+	    f2 = _poly$faceOfVertex2[2];
 
 	_treeSubdivide.call(this, [face], [f0, f1, f2]);
 
@@ -230,25 +226,19 @@ function _faceSubdivide(face, q) {
 function _edgeSplit(edge, q) {
 	var poly = _poly.get(this);
 
-	var _poly$faceOfEdge = poly.faceOfEdge(edge);
-
-	var _poly$faceOfEdge2 = _slicedToArray(_poly$faceOfEdge, 2);
-
-	var face0 = _poly$faceOfEdge2[0];
-	var face1 = _poly$faceOfEdge2[1];
-
+	var _poly$faceOfEdge = poly.faceOfEdge(edge),
+	    _poly$faceOfEdge2 = _slicedToArray(_poly$faceOfEdge, 2),
+	    face0 = _poly$faceOfEdge2[0],
+	    face1 = _poly$faceOfEdge2[1];
 
 	var v4 = poly.splitEdge(edge, q);
 
-	var _poly$faceOfVertex3 = poly.faceOfVertex(v4);
-
-	var _poly$faceOfVertex4 = _slicedToArray(_poly$faceOfVertex3, 4);
-
-	var f0 = _poly$faceOfVertex4[0];
-	var f1 = _poly$faceOfVertex4[1];
-	var f2 = _poly$faceOfVertex4[2];
-	var f3 = _poly$faceOfVertex4[3];
-
+	var _poly$faceOfVertex3 = poly.faceOfVertex(v4),
+	    _poly$faceOfVertex4 = _slicedToArray(_poly$faceOfVertex3, 4),
+	    f0 = _poly$faceOfVertex4[0],
+	    f1 = _poly$faceOfVertex4[1],
+	    f2 = _poly$faceOfVertex4[2],
+	    f3 = _poly$faceOfVertex4[3];
 
 	_treeSubdivide.call(this, [face0], [f3, f2]);
 	_treeSubdivide.call(this, [face1], [f1, f0]);
@@ -269,24 +259,18 @@ function _edgeTurn(face0, edge) {
 	    tree = _tree.get(this);
 	var face1 = poly.faceOfEdge(edge, face0)[0];
 
-	var _poly$vertexOfFace = poly.vertexOfFace(face0, edge);
-
-	var _poly$vertexOfFace2 = _slicedToArray(_poly$vertexOfFace, 3);
-
-	var v0 = _poly$vertexOfFace2[0];
-	var v1 = _poly$vertexOfFace2[1];
-	var v2 = _poly$vertexOfFace2[2];
-
+	var _poly$vertexOfFace = poly.vertexOfFace(face0, edge),
+	    _poly$vertexOfFace2 = _slicedToArray(_poly$vertexOfFace, 3),
+	    v0 = _poly$vertexOfFace2[0],
+	    v1 = _poly$vertexOfFace2[1],
+	    v2 = _poly$vertexOfFace2[2];
 
 	var e0 = poly.turnEdge(edge);
 
-	var _poly$faceOfEdge3 = poly.faceOfEdge(e0);
-
-	var _poly$faceOfEdge4 = _slicedToArray(_poly$faceOfEdge3, 2);
-
-	var f0 = _poly$faceOfEdge4[0];
-	var f1 = _poly$faceOfEdge4[1];
-
+	var _poly$faceOfEdge3 = poly.faceOfEdge(e0),
+	    _poly$faceOfEdge4 = _slicedToArray(_poly$faceOfEdge3, 2),
+	    f0 = _poly$faceOfEdge4[0],
+	    f1 = _poly$faceOfEdge4[1];
 
 	_treeSubdivide.call(this, [face0, face1], [f0, f1]);
 
@@ -389,13 +373,11 @@ var TriangleSubdivisionTree = function () {
 
 			if (face1 === -1) return true;
 
-			var _poly$pointOfFace = poly.pointOfFace(face0, edge);
-
-			var _poly$pointOfFace2 = _slicedToArray(_poly$pointOfFace, 3);
-
-			var p0 = _poly$pointOfFace2[0];
-			var p1 = _poly$pointOfFace2[1];
-			var p2 = _poly$pointOfFace2[2];
+			var _poly$pointOfFace = poly.pointOfFace(face0, edge),
+			    _poly$pointOfFace2 = _slicedToArray(_poly$pointOfFace, 3),
+			    p0 = _poly$pointOfFace2[0],
+			    p1 = _poly$pointOfFace2[1],
+			    p2 = _poly$pointOfFace2[2];
 
 			var p3 = poly.pointOfFace(face1, edge)[2];
 
@@ -417,21 +399,18 @@ var TriangleSubdivisionTree = function () {
 
 			if (isect === null || _hasFaceFlag.call(this, isect.face, FLAG_FACE_IMMUTABLE)) return;
 
-			var _isect$uv = _slicedToArray(isect.uv, 2);
-
-			var u = _isect$uv[0];
-			var v = _isect$uv[1];
+			var _isect$uv = _slicedToArray(isect.uv, 2),
+			    u = _isect$uv[0],
+			    v = _isect$uv[1];
 
 			var edges = void 0;
 
 			if (u > E0 && v > E0 && u + v < E1) edges = _faceSubdivide.call(this, isect.face, point);else if (u === 1.0 || v === 1.0 || u + v === 0.0) return;else {
-				var _poly$vertexOfFace3 = poly.vertexOfFace(isect.face);
-
-				var _poly$vertexOfFace4 = _slicedToArray(_poly$vertexOfFace3, 3);
-
-				var v0 = _poly$vertexOfFace4[0];
-				var v1 = _poly$vertexOfFace4[1];
-				var v2 = _poly$vertexOfFace4[2];
+				var _poly$vertexOfFace3 = poly.vertexOfFace(isect.face),
+				    _poly$vertexOfFace4 = _slicedToArray(_poly$vertexOfFace3, 3),
+				    v0 = _poly$vertexOfFace4[0],
+				    v1 = _poly$vertexOfFace4[1],
+				    v2 = _poly$vertexOfFace4[2];
 
 				var edge = void 0;
 
@@ -445,9 +424,9 @@ var TriangleSubdivisionTree = function () {
 			for (var item = edges.pop(); item !== undefined; item = edges.pop()) {
 				var _edges;
 
-				var _item = item;
-				var face = _item.face;
-				var _edge = _item.edge;
+				var _item = item,
+				    face = _item.face,
+				    _edge = _item.edge;
 
 
 				if (!_hasEdgeFlag.call(this, _edge, FLAG_EDGE_IMMUTABLE) && !this.testEdge(face, _edge)) (_edges = edges).push.apply(_edges, _toConsumableArray(_edgeTurn.call(this, face, _edge)));

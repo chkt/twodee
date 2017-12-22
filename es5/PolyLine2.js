@@ -39,20 +39,15 @@ function _intersectColinearSegments(p0, p1, q0, q1, r) {
 	    sq0 = q0.n[i] - o,
 	    sq1 = q1.n[i] - o;
 
-	var _ref = 0.0 < sp1 ? [0.0, sp1] : [sp1, 0.0];
+	var _ref = 0.0 < sp1 ? [0.0, sp1] : [sp1, 0.0],
+	    _ref2 = _slicedToArray(_ref, 2),
+	    pmin = _ref2[0],
+	    pmax = _ref2[1];
 
-	var _ref2 = _slicedToArray(_ref, 2);
-
-	var pmin = _ref2[0];
-	var pmax = _ref2[1];
-
-	var _ref3 = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0];
-
-	var _ref4 = _slicedToArray(_ref3, 2);
-
-	var qmin = _ref4[0];
-	var qmax = _ref4[1];
-
+	var _ref3 = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0],
+	    _ref4 = _slicedToArray(_ref3, 2),
+	    qmin = _ref4[0],
+	    qmax = _ref4[1];
 
 	if (pmax - qmin < 0 || qmax - pmin < 0) return false;
 
@@ -79,7 +74,6 @@ var PolyLine2 = function () {
 		/**
    * Returns a new instance from the convex hull of point
    * Using graham scanning
-   * @constructor
    * @param {Vector2[]} point - The points
    * @param {PolyLine2} [target] - The target instance
    * @returns {PolyLine2}
@@ -124,7 +118,6 @@ var PolyLine2 = function () {
 
 		/**
    * Returns a new instance from rectangle
-   * @constructor
    * @param {Rectangle2} rectangle - The source
    * @param {PolyLine2} [target] - The target instance
    * @returns {PolyLine2}
@@ -164,7 +157,6 @@ var PolyLine2 = function () {
 
 		/**
    * Returns a copy of poly
-   * @constructor
    * @param {PolyLine2} poly - The source
    * @param {PolyLine2} [target] - The target instance
    * @returns {PolyLine2}
@@ -293,7 +285,7 @@ var PolyLine2 = function () {
 
 		/**
    * The points
-   * @type Vector2[]
+   * @type {Vector2[]}
    */
 		this.point = point || [];
 	}
@@ -315,7 +307,7 @@ var PolyLine2 = function () {
 
 		/**
    * The number of segments
-   * @type int
+   * @type {int}
    */
 
 	}, {
@@ -433,7 +425,7 @@ var PolyLine2 = function () {
 
 		/**
    * true if the first and last points are identical (===), false otherwise
-   * @type boolean
+   * @type {boolean}
    */
 
 	}, {

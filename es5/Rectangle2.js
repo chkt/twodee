@@ -56,7 +56,6 @@ var Rectangle2 = function () {
 
 		/**
    * Defines an instance
-   * @constructor
    * @param {Matrix3} transform - The transform
    * @param {Vector2} extend - The extend
    * @param {Rectangle2} [target] - The target instance
@@ -68,7 +67,6 @@ var Rectangle2 = function () {
 
 		/**
    * Returns a new instance from w, h
-   * @constructor
    * @param {number} w - The width
    * @param {number} h - The height
    * @param {Rectangle2} [target] - The target instance
@@ -85,7 +83,6 @@ var Rectangle2 = function () {
 
 		/**
    * Returns a new instance from point
-   * @constructor
    * @param {Vector2[]} point - The points
    * @param {Rectangle2} [target] - The target instance
    * @returns {Rectangle2}
@@ -123,7 +120,6 @@ var Rectangle2 = function () {
 
 		/**
    * Returns an instance representing the transformation of rectangle
-   * @constructor
    * @param {Rectangle2} rectangle - The source
    * @param {Matrix3} transform - The transform
    * @param {Rectangle2} [target] - The target instance
@@ -140,7 +136,6 @@ var Rectangle2 = function () {
 
 		/**
    * Returns a copy of rectangle
-   * @constructor
    * @param {Rectangle2} rectangle - The source
    * @param {Rectangle2} [target] - The target instance
    * @returns {Rectangle2}
@@ -338,12 +333,12 @@ var Rectangle2 = function () {
 
 		/**
    * The transform
-   * @type Matrix3
+   * @type {Matrix3}
    */
 		this.transform = transform || new _Matrix2.default();
 		/**
    * The half-dimensions
-   * @type Vector2
+   * @type {Vector2}
    */
 		this.extend = extend || new _Vector2.default();
 	}
@@ -366,7 +361,7 @@ var Rectangle2 = function () {
 
 		/**
    * The dereferenced center point
-   * @type Vector2
+   * @type {Vector2}
    */
 
 	}, {
@@ -499,7 +494,7 @@ var Rectangle2 = function () {
 		/**
    * The width
    * Alias of {@link Rectangle2#extend}
-   * @type number
+   * @type {number}
    */
 
 	}, {
@@ -514,7 +509,7 @@ var Rectangle2 = function () {
 		/**
    * The height
    * Alias of {@link Rectangle#extend}
-   * @type number
+   * @type {number}
    */
 
 	}, {
@@ -528,7 +523,7 @@ var Rectangle2 = function () {
 
 		/**
    * The aspect (w/h)
-   * @type number
+   * @type {number}
    */
 
 	}, {
@@ -539,7 +534,7 @@ var Rectangle2 = function () {
 
 		/**
    * The area (w*h)
-   * @type number
+   * @type {number}
    */
 
 	}, {

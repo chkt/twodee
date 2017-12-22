@@ -56,7 +56,6 @@ var Triangle2 = function () {
 
 		/**
    * Returns an instance representing the equilateral triangle circumscribed|inscribed by r, rotated by rad
-   * @constructor
    * @param {Vector2} p - The centroid point
    * @param {number} r - The distance between centroid and point
    * @param {number} [rad=0.0] - The angle
@@ -65,9 +64,9 @@ var Triangle2 = function () {
    * @returns {Triangle2}
    */
 		value: function Equilateral(p, r) {
-			var rad = arguments.length <= 2 || arguments[2] === undefined ? 0.0 : arguments[2];
-			var f = arguments.length <= 3 || arguments[3] === undefined ? 0.0 : arguments[3];
-			var target = arguments.length <= 4 || arguments[4] === undefined ? undefined : arguments[4];
+			var rad = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.0;
+			var f = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.0;
+			var target = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : undefined;
 
 			if (f !== undefined) r = _Math2.default.mix(r, r / _Math2.default.cos(_Math2.default.PI / 3.0), f);
 
@@ -88,7 +87,6 @@ var Triangle2 = function () {
 
 		/**
    * Returns an instance representing the transformation of triangle
-   * @constructor
    * @param {Triangle2} triangle - The source
    * @param {Matrix3} transform - The transform
    * @param {Triangle2} [target] - The target instance
@@ -338,17 +336,17 @@ var Triangle2 = function () {
 
 		/**
    * The first point
-   * @type Vector2
+   * @type {Vector2}
    */
 		this.p0 = p0 || new _Vector2.default();
 		/**
    * The second point
-   * @type Vector2
+   * @type {Vector2}
    */
 		this.p1 = p1 || new _Vector2.default();
 		/**
    * The third point
-   * @type Vector2
+   * @type {Vector2}
    */
 		this.p2 = p2 || new _Vector2.default();
 	}
@@ -372,7 +370,7 @@ var Triangle2 = function () {
 
 		/**
    * CW (1) if the instance is cw rotated, CCW (-1) if the instance is ccw rotated, DEGENERATE (0) if the instance is degenerate
-   * @type int
+   * @type {int}
    */
 
 	}, {
@@ -469,6 +467,7 @@ var Triangle2 = function () {
 
 		/**
    * Returns a string representation of the instance
+   * @param {int} [digits=3] - The decimal places
    * @returns {string}
    */
 
@@ -489,7 +488,7 @@ var Triangle2 = function () {
 
 		/**
    * The dereferenced centroid point
-   * @type Vector2
+   * @type {Vector2}
    */
 
 	}, {
@@ -500,7 +499,7 @@ var Triangle2 = function () {
 
 		/**
    * The dereferenced center of the enclosing circle
-   * @type Vector2
+   * @type {Vector2}
    */
 
 	}, {
@@ -511,7 +510,7 @@ var Triangle2 = function () {
 
 		/**
    * The area (1/2)|AB x AC|
-   * @type number
+   * @type {number}
    */
 
 	}, {

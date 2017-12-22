@@ -58,13 +58,10 @@ function _intersectColinearRaySegment(pa, oa, q0, q1, r) {
 	    sq0 = (q0.n[i] - o) * sgn,
 	    sq1 = (q1.n[i] - o) * sgn;
 
-	var _ref = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0];
-
-	var _ref2 = _slicedToArray(_ref, 2);
-
-	var qmin = _ref2[0];
-	var qmax = _ref2[1];
-
+	var _ref = sq0 < sq1 ? [sq0, sq1] : [sq1, sq0],
+	    _ref2 = _slicedToArray(_ref, 2),
+	    qmin = _ref2[0],
+	    qmax = _ref2[1];
 
 	if (qmax < 0.0) return false;
 
@@ -84,7 +81,6 @@ var Ray2 = function () {
 
 		/**
    * Returns a defined instance
-   * @constructor
    * @param {Vector2} origin - The ray origin
    * @param {Vector2} orientation - The ray orientation
    * @param {Ray2} [target] - The target instance
@@ -266,7 +262,7 @@ var Ray2 = function () {
 	}, {
 		key: 'toString',
 		value: function toString() {
-			var digits = arguments.length <= 0 || arguments[0] === undefined ? 3 : arguments[0];
+			var digits = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 3;
 
 			return '[Ray2] ' + this.origin.toString(digits) + ' ' + this.orientation.toString(digits);
 		}

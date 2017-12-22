@@ -221,7 +221,6 @@ var Polygon2 = function () {
 
 		/**
    * Returns a defined instance
-   * @constructor
    * @param {Polygon2} [target] - The target instance
    * @returns {Polygon2}
    */
@@ -233,7 +232,6 @@ var Polygon2 = function () {
 
 		/**
    * Returns an instance created from json
-   * @constructor
    * @param {Object} json - The json representation of the instance
    * @param {Polygon2} [target] - The target instance
    * @returns {Polygon2}
@@ -242,8 +240,8 @@ var Polygon2 = function () {
 	}, {
 		key: 'JSON',
 		value: function JSON(json, target) {
-			var f = json.f;
-			var p = json.p;
+			var f = json.f,
+			    p = json.p;
 
 
 			target = this.Define(target);
@@ -258,7 +256,6 @@ var Polygon2 = function () {
 		/**
    * Returns an instance from points
    * Using TriangleSubdivisionTree
-   * @constructor
    * @param {Vector2[]} points - The points
    * @returns {Polygon2}
    */
@@ -279,7 +276,6 @@ var Polygon2 = function () {
 		/**
    * Returns an instance from outline
    * Using TriangleSubdivisionTree
-   * @constructor
    * @param {PolyLine2} outline - The outline
    * @returns {Polygon2}
    */
@@ -299,7 +295,6 @@ var Polygon2 = function () {
 
 		/**
    * Returns a copy of poly
-   * @constructor
    * @param {Polygon2} poly - The source
    * @param {Polygon2} [target] - The target instance
    * @returns {Polygon2}
@@ -367,7 +362,7 @@ var Polygon2 = function () {
 
 		/**
    * The dereferenced defined face indices of the instance
-   * @type int[]
+   * @type {int[]}
    */
 
 	}, {
@@ -427,7 +422,7 @@ var Polygon2 = function () {
    * Returns the ccw ordered points associated with face
    * Proxies {@link Polygon2#vertexOfFace}
    * @param {int} face - The face index
-   * @param {Int} [edge] - The edge index of the first ccw vertex index
+   * @param {int} [edge] - The edge index of the first ccw vertex index
    * @returns {Vector2[]}
    */
 
@@ -436,14 +431,11 @@ var Polygon2 = function () {
 		value: function pointOfFace(face, edge) {
 			var point = _point.get(this);
 
-			var _vertexOfFace = this.vertexOfFace(face, edge);
-
-			var _vertexOfFace2 = _slicedToArray(_vertexOfFace, 3);
-
-			var vertex0 = _vertexOfFace2[0];
-			var vertex1 = _vertexOfFace2[1];
-			var vertex2 = _vertexOfFace2[2];
-
+			var _vertexOfFace = this.vertexOfFace(face, edge),
+			    _vertexOfFace2 = _slicedToArray(_vertexOfFace, 3),
+			    vertex0 = _vertexOfFace2[0],
+			    vertex1 = _vertexOfFace2[1],
+			    vertex2 = _vertexOfFace2[2];
 
 			return [point[vertex0], point[vertex1], point[vertex2]];
 		}
@@ -505,13 +497,10 @@ var Polygon2 = function () {
 		value: function pointOfEdge(edge, vertex) {
 			var point = _point.get(this);
 
-			var _vertexOfEdge = this.vertexOfEdge(edge, vertex);
-
-			var _vertexOfEdge2 = _slicedToArray(_vertexOfEdge, 2);
-
-			var vertex0 = _vertexOfEdge2[0];
-			var vertex1 = _vertexOfEdge2[1];
-
+			var _vertexOfEdge = this.vertexOfEdge(edge, vertex),
+			    _vertexOfEdge2 = _slicedToArray(_vertexOfEdge, 2),
+			    vertex0 = _vertexOfEdge2[0],
+			    vertex1 = _vertexOfEdge2[1];
 
 			return [point[vertex0], point[vertex1]];
 		}
@@ -887,14 +876,11 @@ var Polygon2 = function () {
 			var v3 = this.createVertex(point);
 
 			if (e[f0] !== -1) {
-				var _vertexOfFace3 = this.vertexOfFace(e[f0], edge);
-
-				var _vertexOfFace4 = _slicedToArray(_vertexOfFace3, 3);
-
-				var v0 = _vertexOfFace4[0];
-				var v1 = _vertexOfFace4[1];
-				var v2 = _vertexOfFace4[2];
-
+				var _vertexOfFace3 = this.vertexOfFace(e[f0], edge),
+				    _vertexOfFace4 = _slicedToArray(_vertexOfFace3, 3),
+				    v0 = _vertexOfFace4[0],
+				    v1 = _vertexOfFace4[1],
+				    v2 = _vertexOfFace4[2];
 
 				this.removeFace(e[f0]);
 				this.createFace(v0, v3, v2);
@@ -902,14 +888,11 @@ var Polygon2 = function () {
 			}
 
 			if (ef1 !== -1) {
-				var _vertexOfFace5 = this.vertexOfFace(e[f1], edge);
-
-				var _vertexOfFace6 = _slicedToArray(_vertexOfFace5, 3);
-
-				var _v = _vertexOfFace6[0];
-				var _v2 = _vertexOfFace6[1];
-				var _v3 = _vertexOfFace6[2];
-
+				var _vertexOfFace5 = this.vertexOfFace(e[f1], edge),
+				    _vertexOfFace6 = _slicedToArray(_vertexOfFace5, 3),
+				    _v = _vertexOfFace6[0],
+				    _v2 = _vertexOfFace6[1],
+				    _v3 = _vertexOfFace6[2];
 
 				this.removeFace(e[f1]);
 				this.createFace(_v, v3, _v3);
@@ -932,22 +915,17 @@ var Polygon2 = function () {
 			    f0 = edge * 4,
 			    f1 = f0 + 1;
 
-			var _vertexOfFace7 = this.vertexOfFace(e[f0], edge);
+			var _vertexOfFace7 = this.vertexOfFace(e[f0], edge),
+			    _vertexOfFace8 = _slicedToArray(_vertexOfFace7, 3),
+			    f0v0 = _vertexOfFace8[0],
+			    f0v1 = _vertexOfFace8[1],
+			    f0v2 = _vertexOfFace8[2];
 
-			var _vertexOfFace8 = _slicedToArray(_vertexOfFace7, 3);
-
-			var f0v0 = _vertexOfFace8[0];
-			var f0v1 = _vertexOfFace8[1];
-			var f0v2 = _vertexOfFace8[2];
-
-			var _vertexOfFace9 = this.vertexOfFace(e[f1], edge);
-
-			var _vertexOfFace10 = _slicedToArray(_vertexOfFace9, 3);
-
-			var f1v0 = _vertexOfFace10[0];
-			var f1v1 = _vertexOfFace10[1];
-			var f1v2 = _vertexOfFace10[2];
-
+			var _vertexOfFace9 = this.vertexOfFace(e[f1], edge),
+			    _vertexOfFace10 = _slicedToArray(_vertexOfFace9, 3),
+			    f1v0 = _vertexOfFace10[0],
+			    f1v1 = _vertexOfFace10[1],
+			    f1v2 = _vertexOfFace10[2];
 
 			this.removeFace(e[f0]);
 			this.removeFace(e[f1]);
@@ -1121,7 +1099,7 @@ var Polygon2 = function () {
 
 		/**
    * The dereferenced defined edge indices of the instance
-   * @type int[]
+   * @type {int[]}
    */
 
 	}, {
@@ -1139,7 +1117,7 @@ var Polygon2 = function () {
 
 		/**
    * The dereferenced defined vertex indices of the instance
-   * @type int[]
+   * @type {int[]}
    */
 
 	}, {
@@ -1157,7 +1135,7 @@ var Polygon2 = function () {
 
 		/**
    * The deferenced list of points of the instance
-   * @type Vector2[]
+   * @type {Vector2[]}
    */
 
 	}, {
@@ -1168,7 +1146,7 @@ var Polygon2 = function () {
 
 		/**
    * The dereferenced display list of vertex indices of the instance
-   * @type number[]
+   * @type {number[]}
    */
 
 	}, {
@@ -1186,7 +1164,7 @@ var Polygon2 = function () {
 
 		/**
    * The dereferenced centroid point
-   * @returns {Vector2}
+   * @type {Vector2}
    */
 
 	}, {
@@ -1216,7 +1194,7 @@ var Polygon2 = function () {
 
 		/**
    * The area sum((1/2)|AB x AC|)
-   * @returns {number}
+   * @type {number}
    */
 
 	}, {
