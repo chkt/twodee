@@ -1,6 +1,6 @@
 {
 	"name" : "twodee",
-	"description" : "2d primitives: circle, rectangle, obb, triangle, polygon, ray, intersections",
+	"description" : "2d primitives: circle, rectangle, bezier curve, obb, triangle, polygon, ray, intersections",
 	"version" : "0.2.7",
 	"license" : "MIT",
 
@@ -15,13 +15,15 @@
 		"rectangle",
 		"mesh",
 		"polyline",
+		"bezier curve",
+		"cubic bezier",
 		"polygon"
 	],
 
 	"author" : {
 		"name" : "Christoph Kettelhoit",
-		"email" : "ck@christoph-kettelhoit.de",
-		"url" : "christoph-kettelhoit.de"
+		"email" : "ck@chkt.one",
+		"url" : "https://chkt.one"
 	},
 
 	"repository" : {
