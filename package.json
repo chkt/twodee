@@ -30,9 +30,10 @@
 	},
 
 	"scripts" : {
-		"gulp" : "node ./node_modules/gulp/bin/gulp.js",
 		"test" : "node ./node_modules/gulp/bin/gulp.js test",
-		"doc" : "less package.md > readme.md && node ./node_modules/documentation/bin/documentation.js build -f md source/ >> readme.md"
+		"build" : "node ./node_modules/gulp/bin/gulp.js build",
+		"doc" : "less package.md > readme.md && node ./node_modules/documentation/bin/documentation.js build -f md source/ >> readme.md",
+		"gulp" : "node ./node_modules/gulp/bin/gulp.js"
 	},
 
 	"files" : [
